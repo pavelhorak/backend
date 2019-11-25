@@ -4,6 +4,8 @@
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate diesel;
 
+mod rgi;
+
 mod static_server;
 mod db;
 
@@ -14,8 +16,8 @@ fn main() {
         .mount("/", routes![
             static_server::index,
             static_server::frontend,
-            static_server::rgi,
         ])
+        .mount("/", rgi::routes())
         .attach(
             DbConn::fairing()
         )
