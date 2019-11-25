@@ -17,7 +17,7 @@ fn main() {
             static_server::index,
             static_server::frontend,
         ])
-        .mount("/", rgi::routes())
+        .mount("/rgi/", rgi::routes())
         .attach(
             DbConn::fairing()
         )
