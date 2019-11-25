@@ -1,6 +1,6 @@
 use rocket::response::NamedFile;
 
 #[get("/")]
-fn index() -> String{
+pub fn index() -> String{
     "index".to_string()
 }
