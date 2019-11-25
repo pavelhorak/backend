@@ -16,6 +16,6 @@ pub fn rgi(name: String) -> String {
 }
 
 #[catch(404)]
-pub not_found() -> NamedFile {
+pub fn not_found() -> NamedFile {
     NamedFile::open("fontend/404.html").expect("404.html not found")
 }
