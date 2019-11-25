@@ -2,15 +2,12 @@
 
 #[macro_use] extern crate rocket;
 
-use rocket::response::NamedFile;
-
-#[get("/")]
-fn index() -> String{
-    "index".to_string()
-}
+mod static_server;
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index])
+        .mount("/", routes![
+            static_server::index,
+        ])
         .launch();
 }
