@@ -8,6 +8,8 @@ fn main() {
     rocket::ignite()
         .mount("/", routes![
             static_server::index,
+            static_server::frontend,
+            static_server::rgi,
         ])
         .launch();
 }
