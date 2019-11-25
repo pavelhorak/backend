@@ -1,0 +1,2 @@
+[global.databases]
+postgres_db = { url = "postgres://postgres:heslo@localhost/auditorium_booking" }
