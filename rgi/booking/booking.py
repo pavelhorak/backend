@@ -14,17 +14,25 @@ session = Session(engine)
 
 
 def get(data):
-    ...
+	"""
+	Receive data as a dictionary containing id. 
+	Return the Booking with the given id.
+	"""
+
+
 def post(data):
     ...
+
+
 def patch(data):
     ...
+
+
 def delete(data):
-    ...g
+    ...
+
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
-
-
 data = json.load(sys.stdin)
 if len(sys.argv) < 2:
     methods["get"](data)
