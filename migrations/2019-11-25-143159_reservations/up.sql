@@ -1,1 +1,11 @@
 -- Your SQL goes here
+CREATE TABLE IF NOT EXISTS booking (
+	id SERIAL NOT NULL PRIMARY KEY,
+	name VARCHAR NOT NULL,
+	description VARCHAR NOT NULL,
+	rooms INTEGER NOT NULL,
+	begin_time TIME NOT NULL,
+	end_time TIME NOT NULL,
+	layout INTEGER NOT NULL,
+	approved BOOLEAN NOT NULL
+)
