@@ -2,6 +2,8 @@
 
 #[macro_use] extern crate rocket;
 
+use rocket::response::NamedFile;
+
 #[get("/")]
 fn index() -> String{
     "index".to_string()
@@ -9,6 +11,6 @@ fn index() -> String{
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![hello])
+        .mount("/", routes![index])
         .launch();
 }
