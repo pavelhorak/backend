@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS booking (
 	name VARCHAR NOT NULL,
 	description VARCHAR NOT NULL,
 	rooms INTEGER NOT NULL,
-	begin TIME NOT NULL,
-	end TIME NOT NULL,
+	begin_time TIME NOT NULL,
+	end_time TIME NOT NULL,
 	layout INTEGER NOT NULL,
 	approved BOOLEAN NOT NULL
 )
