@@ -2,6 +2,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 import sys
+import json
 import os
 
 
@@ -19,7 +20,7 @@ def post(data):
 def patch(data):
     ...
 def delete(data):
-    ...
+    ...g
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
 
