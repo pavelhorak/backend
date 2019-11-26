@@ -21,8 +21,7 @@ def get(data):
 
 
 def post(data):
-    ...
-
+    """Create a new booking in the datatbase from the data given"""
 
 def patch(data):
     ...
