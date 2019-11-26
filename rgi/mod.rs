@@ -1,9 +1,37 @@
 use rocket::Route;
 
+#[macro_export]
+macro_rules! rgi {
+	{$method:ident $name:literal $(arg: $arg:ident),*  $(data: $data:tt)? } => {
+		#[allow(unused_imports)]
+		use std::process::{Command, Stdio};
+		#[allow(unused_imports)]
+		use std::io::{Read, Write};
+
+		let mut cmd = Command::new($name)
+			.stdin(Stdio::piped())
+			.stdout(Stdio::piped())
+			.arg(stringify!($method))
+			.spawn()
+			.expect("kinda gay");
+
+		if let Some(ref mut stdin) = &mut cmd.stdin {
+			$(let _ = writeln!(stdin, "{}: {}", stringify!($arg), ($arg).to_string());)*
+		}
+
+		let cmd = cmd.wait_with_output().unwrap();
+
+		String::from_utf8_lossy(&cmd.stdout).to_string()
+	}
+}
+
 mod booking;
 
 pub fn routes() -> Vec<Route> {
-    routes![
-        booking::booking,
-    ]
+	let mut routes = vec![];
+
+	/*routes() funkce volat tady*/
+	routes.extend(self::booking::routes());
+
+	routes
 }
