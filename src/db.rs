@@ -6,7 +6,7 @@ use diesel::data_types::PgTime;
 use serde::{Serialize, Deserialize};
 
 #[database("postgres_db")]
-pub struct DbConn(diesel::PgConnection);
+pub struct DbConn(diesel::SqliteConnection);
 
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Queryable, Debug, Clone)]
