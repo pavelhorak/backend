@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import sys
 import json
 import os
-
+#lukáš je komouš
 
 Base = automap_base()
 engine = create_engine(os.getenv("DATABASE_URL"))
