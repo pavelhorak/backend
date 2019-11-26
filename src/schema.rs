@@ -1,12 +1,12 @@
 table! {
     booking (id) {
-        id -> Int4,
-        name -> Varchar,
-        description -> Varchar,
-        rooms -> Int4,
-        begin_time -> Time,
-        end_time -> Time,
-        layout -> Int4,
-        approved -> Bool,
+        id -> Integer,
+        name -> Text,
+        description -> Text,
+        rooms -> Integer,
+        begin_time -> Text,
+        end_time -> Text,
+        layout -> Integer,
+        approved -> Integer,
     }
 }
