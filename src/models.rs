@@ -1,9 +1,10 @@
 #[derive(Queryable)]
 pub struct Reservation {
-    id: u32,
+    id: u16,
     name: String,
     description: String,
-    rooms: u16,
+    author: String,
+    rooms: u8,
     begin_time: String,
     end_time: String,
     layout: u16,
