@@ -1,18 +1,13 @@
 use rocket::response::NamedFile;
 
 #[get("/")]
-pub fn index() -> String{
-    "index".to_string()
+pub fn index() -> NamedFile{
+    NamedFile::open("frontend/index.html").expect("index.html not found")
 }
 
-#[get("/<name>")]
+#[get("/static/<name>")]
 pub fn frontend(name: String) -> NamedFile {
     NamedFile::open(format!("frontend/build/{}", name)).expect("file not found")
-}
-
-#[get("/rgi/<name>")]
-pub fn rgi(name: String) -> String {
-    "wip".to_string()
 }
 
 #[catch(404)]
