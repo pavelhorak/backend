@@ -3,6 +3,16 @@ use rocket_contrib::json::Json;
 
 use crate::db::NewReservation;
 
+/// vrací všechny rezervace
+///
+/// GET /booking "application/json"
+#[get("/booking", format = "application/json")]
+pub fn list() -> String {
+	rgi! {
+		LIST "rgi/booking/booking.py"
+	}
+}
+
 /// vrátí JSON dané rezervace
 ///
 /// GET /booking/<id> application/json
@@ -63,6 +73,7 @@ pub fn delete(id: i32) -> String {
 
 pub fn routes() -> Vec<Route> {
 	routes![
+                list,
 		get,
 		post,
 		patch,
