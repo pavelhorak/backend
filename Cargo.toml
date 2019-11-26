@@ -1,7 +1,7 @@
 [package]
 name = "backend"
 version = "0.1.0"
-authors = ["Dawid J. Kubis <dawidk.kubis3@gmail.com>", "Lukáš Hozda <luk.hozda@gmail.com>"]
+authors = ["Dawid J. Kubis <dawidk.kubis3@gmail.com>", "Lukáš Hozda <luk.hozda@gmail.com>", "Lukáš Veškrna <lukas.veskrna@gmail.com>"]
 edition = "2018"
 build = "build.rs"
 
