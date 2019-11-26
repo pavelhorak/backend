@@ -1,5 +1,5 @@
-use chrono::DateTime;
 use rocket_contrib::databases::diesel;
+use diesel::data_types::PgTime;
 
 #[database("postgres_db")]
 pub struct DbConn(diesel::PgConnection);
@@ -11,8 +11,8 @@ pub struct Reservation {
     description: String,
     author: String,
     rooms: u8,
-    begin_time: DateTime,
-    end_time: DateTime,
+    begin_time: PgTime,
+    end_time: PgTime,
     layout: u16,
     approved: bool,
 }
