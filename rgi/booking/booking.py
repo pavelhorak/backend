@@ -69,7 +69,7 @@ def post(data):
     result.approved = False
 
     events = session.query(Booking).filter(Booking.begin_time <= result.end_time).\
-                                    filter(Booking.end_time <= result.start_time)
+                                    filter(Booking.end_time <= result.begin_time)
     for event in events:
         if event.rooms == 3:
             return json.dumps({"error": "Room is already used"})
