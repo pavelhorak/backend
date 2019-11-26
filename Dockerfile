@@ -1,7 +1,8 @@
 FROM archlinux/base
 
 # dependencies
-RUN pacman -Suy --noconfirm rustup make gcc pkgconf postgresql
+RUN pacman -Suy --noconfirm rustup make gcc pkgconf postgresql \
+python python-sqlalchemy python-psycopg2
 RUN rustup install nightly && systemctl enable postgresql.service
 
 # workdir
