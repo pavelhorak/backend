@@ -27,10 +27,10 @@ def get(data):
         result = {}
         for attr, value in results[0].__dict__.items():
             result[attr] = value
-        return json.dump(result)
+        return json.dumps(result)
 
     else:
-        return json.dump({"error": "Dawid Kubis to rozbil"})
+        return json.dumps({"error": "Dawid Kubis to rozbil"})
 
 
 def post(data):
@@ -47,9 +47,9 @@ def post(data):
             result.key = value
         session.add(result)
         session.commit()
-        return json.dump({"success": True})
+        return json.dumps({"success": True})
     else:
-        return json.dump({"error": "Do you want to kill it?"})
+        return json.dumps({"error": "Do you want to kill it?"})
 
 def patch(data):
     """
@@ -65,9 +65,9 @@ def patch(data):
             result.key = value
         session.add(result)
         session.commit()
-        return json.dump({"success": True})
+        return json.dumps({"success": True})
     else:
-        return json.dump({"error": "blame David Kubis for this one"})
+        return json.dumps({"error": "blame David Kubis for this one"})
 
 def delete(data):
     """
@@ -79,9 +79,9 @@ def delete(data):
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         session.delete(results[0])
-        return json.dump({"success": True})
+        return json.dumps({"success": True})
     else:
-        return json.dump({"error": "Delete failed, bitches"})
+        return json.dumps({"error": "Delete failed, bitches"})
 
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
