@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 import sys
 import json
 import os
+import re
 
 
 Base = automap_base()
@@ -21,7 +22,7 @@ def get(data):
     :param data: {id}
     :return: Booking dictionary or {error: (True/False)}
     """
-    results = session.query(Booking).filter(Booking.id == data.id).all()
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         result = {}
         for attr, value in k.__dict__.items():
@@ -85,8 +86,12 @@ def delete(data):
 
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
-data = json.load(sys.stdin)
+txt = sys.stdin.read()
+txt = re.sub(",[ \t\r\n]+}", "}", txt)
+txt = re.sub(",[ \t\r\n]+\]", "]", txt)
+data = json.loads(txt)
 if len(sys.argv) < 2:
     methods["get"](data)
 else:
-    methods[sys.argv[1]](data)
+    methods[sys.argv[1].lower()](data)
+
