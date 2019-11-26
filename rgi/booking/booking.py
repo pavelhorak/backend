@@ -34,7 +34,7 @@ def post(data):
     """
     Adds new data to db
     :param data: Booking dictionary by it's id
-    :return: {success: (True/False)}
+    :return: {success: (True/"error message")}
     """
 
     results = session.query(Booking).filter(Booking.id == data.id).all()
@@ -44,14 +44,15 @@ def post(data):
             result.key = value
         session.add(result)
         session.commit()
+        return json.dump({"success": True})
     else:
-        return json.dump({"error": "Do you want to kill it?"})
+        return json.dump({"success": "Do you want to kill it?"})
 
 def patch(data):
     """
     Update data in the database
     :param data: Booking dictionary
-    :return: {success: (True/False)}
+    :return: {success: (True/"error message")}
     """
 
     results = session.query(Booking).filter(Booking.id == data.id).all()
@@ -61,8 +62,9 @@ def patch(data):
             result.key = value
         session.add(result)
         session.commit()
+        return json.dump({"success": True})
     else:
-        return json.dump({"error": "blame David Kubis for this one"})
+        return json.dump({"success": "blame David Kubis for this one"})
 
 def delete(data):
     """
@@ -74,8 +76,9 @@ def delete(data):
     results = session.query(Booking).filter(Booking.id == data.id).all()
     if len(results) == 1:
         session.delete(results[0])
+        return json.dump({"success": True})
     else:
-        return json.dump({"error": "Delete failed, bitches"})
+        return json.dump({"success": "Delete failed, bitches"})
 
 
 
