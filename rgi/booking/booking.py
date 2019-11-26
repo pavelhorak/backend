@@ -39,7 +39,7 @@ def post(data):
 
     results = session.query(Booking).filter(Booking.id == data.id).all()
     if len(results) == 0:
-        result = results[0]
+        result = Booking()
         for key, value in data.items():
             result.key = value
         session.add(result)
