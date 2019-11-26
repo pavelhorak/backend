@@ -10,6 +10,7 @@ mod rgi;
 mod static_server;
 mod db;
 mod models;
+mod schema;
 
 use db::DbConn;
 
