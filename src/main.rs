@@ -8,11 +8,13 @@ mod rgi;
 
 mod static_server;
 mod db;
+mod schema;
 
 use db::DbConn;
 
 fn main() {
     rocket::ignite()
+        .register(catchers![static_server::not_found])
         .mount("/", routes![
             static_server::index,
             static_server::frontend,
