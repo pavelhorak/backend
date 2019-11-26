@@ -13,20 +13,18 @@ pub fn get(id: i32) -> String {
 
 #[post("/booking", format = "application/json", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>) -> String {
-	let data = serde_json::to_string(&_input.into_inner()).unwrap();
 	rgi! {
 		POST "rgi/booking/booking.py"
-		data: (&data)
+		data: (&_input)
 	}
 }
 
 #[patch("/booking/<id>", format = "application/json", data = "<_input>")]
 pub fn patch(id: i32, _input: Json<NewReservation>) -> String {
-	let data = serde_json::to_string(&_input.into_inner()).unwrap();
 	rgi! {
 		PATCH "rgi/booking/booking.py"
 		arg: id
-		data: (&data)
+		data: (&_input)
 	}
 }
 

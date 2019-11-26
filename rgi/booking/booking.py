@@ -40,16 +40,13 @@ def post(data):
     :return: {success: (True/"error message")}
     """
 
-    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
-    if len(results) == 0:
-        result = Booking()
-        for key, value in data["data"].items():
-            result.key = value
-        session.add(result)
-        session.commit()
-        return json.dumps({"success": True})
-    else:
-        return json.dumps({"error": "Do you want to kill it?"})
+    result = Booking()
+    print(data, file=sys.stderr)
+    for key, value in data["data"].items():
+        result.key = value
+    session.add(result)
+    session.commit()
+    return json.dumps({"success": True})
 
 def patch(data):
     """
@@ -90,7 +87,7 @@ txt = re.sub(",[ \t\r\n]+}", "}", txt)
 txt = re.sub(",[ \t\r\n]+\]", "]", txt)
 data = json.loads(txt)
 if len(sys.argv) < 2:
-    methods["get"](data)
+    sys.stdout.write(methods["get"](data))
 else:
-    methods[sys.argv[1].lower()](data)
-
+    sys.stdout.write(methods[sys.argv[1].lower()](data))
+sys.stdout.flush()
