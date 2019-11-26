@@ -19,10 +19,10 @@ def get(data):
     :param data: {id}
     :return: Booking dictionary or {error: (True/False)}
     """
-    results = session.query(Booking).filter(Booking.id == data.id).all()
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         result = {}
-        for attr, value in k.__dict__.items():
+        for attr, value in results[0].__dict__.items():
             result[attr] = value
         return json.dump(result)
 
@@ -37,16 +37,16 @@ def post(data):
     :return: {success: (True/"error message")}
     """
 
-    results = session.query(Booking).filter(Booking.id == data.id).all()
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 0:
         result = Booking()
-        for key, value in data.items():
+        for key, value in data["data"].items():
             result.key = value
         session.add(result)
         session.commit()
         return json.dump({"success": True})
     else:
-        return json.dump({"success": "Do you want to kill it?"})
+        return json.dump({"error": "Do you want to kill it?"})
 
 def patch(data):
     """
@@ -55,16 +55,16 @@ def patch(data):
     :return: {success: (True/"error message")}
     """
 
-    results = session.query(Booking).filter(Booking.id == data.id).all()
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         result = results[0]
-        for key, value in data.items():
+        for key, value in data["data"].items():
             result.key = value
         session.add(result)
         session.commit()
         return json.dump({"success": True})
     else:
-        return json.dump({"success": "blame David Kubis for this one"})
+        return json.dump({"error": "blame David Kubis for this one"})
 
 def delete(data):
     """
@@ -73,13 +73,12 @@ def delete(data):
     :return: {success: (True/False)}
     """
 
-    results = session.query(Booking).filter(Booking.id == data.id).all()
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         session.delete(results[0])
         return json.dump({"success": True})
     else:
-        return json.dump({"success": "Delete failed, bitches"})
-
+        return json.dump({"error": "Delete failed, bitches"})
 
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
