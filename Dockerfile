@@ -3,7 +3,9 @@ FROM archlinux/base
 # dependencies
 RUN pacman -Suy --noconfirm rustup make gcc pkgconf postgresql \
 python python-sqlalchemy python-psycopg2
-RUN rustup install nightly && systemctl enable postgresql.service
+RUN rustup install nightly && chown -R postgres:postgres /var/run/postgresql
+USER postgres
+RUN initdb -D /var/lib/postgres/data && pg_ctl -D /var/lib/postgres/data start
 
 # workdir
 WORKDIR /cw
