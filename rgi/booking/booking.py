@@ -33,9 +33,19 @@ def get(data):
 def post(data):
     """
     Adds new data to db
-    :param data: Booking dictionary
+    :param data: Booking dictionary by it's id
     :return: {success: (True/False)}
     """
+
+    results = session.query(Booking).filter(Booking.id == data.id).all()
+    if len(results) == 0:
+        result = results[0]
+        for key, value in data.items():
+            result.key = value
+        session.add(result)
+        session.commit()
+    else:
+        return json.dump({"error": "Do you want to kill it?"})
 
 def patch(data):
     """
@@ -44,6 +54,15 @@ def patch(data):
     :return: {success: (True/False)}
     """
 
+    results = session.query(Booking).filter(Booking.id == data.id).all()
+    if len(results) == 1:
+        result = results[0]
+        for key, value in data.items():
+            result.key = value
+        session.add(result)
+        session.commit()
+    else:
+        return json.dump({"error": "blame David Kubis for this one"})
 
 def delete(data):
     """
