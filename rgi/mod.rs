@@ -20,7 +20,10 @@ macro_rules! rgi {
 			let _ = writeln!(stdin, "\t\"args\": {{");
 			$(let _ = writeln!(stdin, "\t\t\"{}\": \"{}\",", stringify!($arg), ($arg).to_string());)*
 			let _ = writeln!(stdin, "\t}},");
-			$(let _ = writeln!(stdin, "\t\"data\": {}", serde_json::to_string($data).unwrap());)?
+			$(let _ = writeln!(stdin, "\t\"data\": {}", serde_json::to_string($data)
+				.unwrap()
+				.replace("{\"", "{")
+				.replace("\"}", "}"));)?
 			let _ = writeln!(stdin, "}}");
 		}
 

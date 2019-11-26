@@ -15,7 +15,7 @@ pub fn get(id: i32) -> String {
 pub fn post(_input: Json<NewReservation>) -> String {
 	rgi! {
 		POST "rgi/booking/booking.py"
-		data: (&_input)
+		data: (&_input.into_inner())
 	}
 }
 
@@ -24,7 +24,7 @@ pub fn patch(id: i32, _input: Json<NewReservation>) -> String {
 	rgi! {
 		PATCH "rgi/booking/booking.py"
 		arg: id
-		data: (&_input)
+		data: (&_input.into_inner())
 	}
 }
 
