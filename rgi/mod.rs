@@ -16,7 +16,12 @@ macro_rules! rgi {
 			.expect("kinda gay");
 
 		if let Some(ref mut stdin) = &mut cmd.stdin {
-			$(let _ = writeln!(stdin, "{}: {}", stringify!($arg), ($arg).to_string());)*
+			let _ = writeln!(stdin, "{{");
+			let _ = writeln!(stdin, "\t\"args\": {{");
+			$(let _ = writeln!(stdin, "\t\t\"{}\": \"{}\",", stringify!($arg), ($arg).to_string());)*
+			let _ = writeln!(stdin, "\t}},");
+			$(let _ = writeln!(stdin, "\t\"data\": {}", serde_json::to_string($data).unwrap());)?
+			let _ = writeln!(stdin, "}}");
 		}
 
 		let cmd = cmd.wait_with_output().unwrap();
