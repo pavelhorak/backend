@@ -2,7 +2,6 @@
 //! pro přidávání nového modelu viz [dokumentace Diesel ORM](https://diesel.rs)
 
 use rocket_contrib::databases::diesel;
-use diesel::data_types::PgTime;
 use serde::{Serialize, Deserialize};
 
 #[database("postgres_db")]
@@ -30,13 +29,13 @@ pub struct Reservation {
 	/// ```
 	pub rooms:       u8,
 	/// počáteční čas rezervace
-	pub begin_time:  PgTime,
+	pub begin_time:  String,
 	/// čas, kdy rezervace končí
-	pub end_time:    PgTime,
+	pub end_time:    String,
 	/// rozložení nábytku v audioriu
-	pub layout:      u16,
+	pub layout:      u8,
 	/// zda byla rezervace schválena
-	pub approved:    bool,
+	pub approved:    u8,
 }
 
 /// Model rezervace pro přidání do databáze
