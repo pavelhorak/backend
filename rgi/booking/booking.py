@@ -52,6 +52,12 @@ def delete(data):
     :return: {success: (True/False)}
     """
 
+    results = session.query(Booking).filter(Booking.id == data.id).all()
+    if len(results) == 1:
+        session.delete(results[0])
+    else:
+        return json.dump({"error": True})
+
 
 
 methods = {"get": get, "post": post, "patch": patch, "delete": delete}
