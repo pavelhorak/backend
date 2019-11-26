@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
@@ -16,6 +17,27 @@ Booking = Base.classes.booking
 session = Session(engine)
 
 
+class AlchemyEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                if field == "classes" or field == "prepare":
+                    continue
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
+
+
 def get(data):
     """
     Get data from the database
@@ -24,13 +46,14 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
-        result = {}
-        for attr, value in results[0].__dict__.items():
-            result[attr] = value
-        return json.dumps(result)
-
+        return json.dumps(results[0], cls=AlchemyEncoder)
     else:
         return json.dumps({"error": "Dawid Kubis to rozbil"})
+
+
+def list_(data):
+    results = session.query(Booking).all()
+    return json.dumps({"results": results}, cls=AlchemyEncoder)
 
 
 def post(data):
@@ -43,10 +66,10 @@ def post(data):
     result = Booking()
     print(data, file=sys.stderr)
     for key, value in data["data"].items():
-        result.key = value
+        setattr(result, key, value)
     session.add(result)
     session.commit()
-    return json.dumps({"success": True})
+    return json.dumps({"success": True, "id": result.id})
 
 def patch(data):
     """
@@ -59,7 +82,7 @@ def patch(data):
     if len(results) == 1:
         result = results[0]
         for key, value in data["data"].items():
-            result.key = value
+            setattr(result, key, value)
         session.add(result)
         session.commit()
         return json.dumps({"success": True})
@@ -81,10 +104,11 @@ def delete(data):
         return json.dumps({"error": "Delete failed, bitches"})
 
 
-methods = {"get": get, "post": post, "patch": patch, "delete": delete}
+methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete}
 txt = sys.stdin.read()
 txt = re.sub(",[ \t\r\n]+}", "}", txt)
 txt = re.sub(",[ \t\r\n]+\]", "]", txt)
+print(txt, file=sys.stderr)
 data = json.loads(txt)
 if len(sys.argv) < 2:
     sys.stdout.write(methods["get"](data))
