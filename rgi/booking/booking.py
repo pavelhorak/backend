@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
