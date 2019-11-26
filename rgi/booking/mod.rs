@@ -13,13 +13,10 @@ pub fn get(id: i32) -> String {
 
 #[post("/booking", format = "application/json", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>) -> String {
-	 unimplemented!()
-	 /* rgi! { ... data: serde_json::to_string(_input).unwrap() } */
+	unimplemented!()
+	/* rgi! { ... data: serde_json::to_string(_input).unwrap() } */
 }
 
 pub fn routes() -> Vec<Route> {
-	routes![
-		get,
-		post,
-	]
-} 
+	routes![get, post,]
+}
