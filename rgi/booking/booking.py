@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
@@ -64,9 +64,18 @@ def post(data):
     """
 
     result = Booking()
-    print(data, file=sys.stderr)
     for key, value in data["data"].items():
         setattr(result, key, value)
+    result.approved = False
+
+    events = session.query(Booking).filter(Booking.begin_time <= result.end_time).\
+                                    filter(Booking.end_time <= result.begin_time)
+    for event in events:
+        if event.rooms == 3:
+            return json.dumps({"error": "Room is already used"})
+        elif event.rooms == result.rooms:
+            return json.dumps({"error": "Room is already used"})
+
     session.add(result)
     session.commit()
     return json.dumps({"success": True, "id": result.id})
