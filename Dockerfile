@@ -5,7 +5,7 @@ RUN pacman -Suy --noconfirm rustup make gcc pkgconf postgresql \
 python python-sqlalchemy python-psycopg2
 RUN rustup install nightly
 USER postgres
-RUN initdb -D /var/lib/postgres/data && pg_ctl -D /var/lib/postgres/data -l logfile start
+RUN cd && initdb -D /var/lib/postgres/data && pg_ctl -D /var/lib/postgres/data -l logfile start
 USER root
 
 # workdir
