@@ -13,4 +13,8 @@ Vrací JSON s následující strukturou
 - layout
 - approved
 
-Jestliže není reservace s daným id nalezena vrací JSON s atributem error, kde chybová hláška
+
+Všechny endpointy:
+  V případě chyby vrátí JSON s atributem error, ve kterém je uložena chybová hláška.
+  
+Ostatní endpointy vrací JSON s atributem success, který je buď True, nebo obsahuje chybovou hlášku
