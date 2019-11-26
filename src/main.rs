@@ -19,7 +19,7 @@ mod schema;
 use db::DbConn;
 
 fn main() {
-	dotenv.ok();
+	dotenv::ok();
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
