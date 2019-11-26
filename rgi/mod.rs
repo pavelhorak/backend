@@ -1,5 +1,30 @@
+//! kořenový rgi modul (endpointy jsou tady, yee-haw)
+//!
+//! _"je to jako CGI, ale s Rustem"_
+//!
+//!
+
 use rocket::Route;
 
+/// makro, které vygeneruje boilerplate pro volání daného rgi
+///
+/// syntaxe (hranaté závorky značí, že parametr není povinný):
+/// ```rust
+/// rgi! {
+///     HTTP_METODA "rgi/cesta/k/rgi/binarce"
+///     [arg: identifikátor]* // argumentem se myslí parametr z URL
+///     [data: <vyraz>]? // někdy je potřeba obalit do závorek ()
+/// }
+/// ```
+/// (všechny argumenty a data musí implementovat `serialize` ze `serde`)
+///
+/// příklad:
+/// rgi! {
+///     GET "rgi/lol/lol.py"
+///     arg: name
+///     arg: password
+///     data: (Objekt)
+/// }
 #[macro_export]
 macro_rules! rgi {
 	{$method:ident $name:literal $(arg: $arg:ident),*  $(data: $data:tt)? } => {
@@ -30,8 +55,20 @@ macro_rules! rgi {
 	}
 }
 
-mod booking;
 
+/// modul obsahující endpointy pro CRUD na rezervaci
+pub mod booking;
+
+/// sbírá jednotlivé endpointy
+///
+/// přidání nového rgi
+/// ```rust,no_run
+/// // deklarace modulu
+/// mod muj_modul;
+///
+/// // v routes..
+/// routes.extend(self::muj_modul::routes());
+/// ```
 pub fn routes() -> Vec<Route> {
 	let mut routes = vec![];
 

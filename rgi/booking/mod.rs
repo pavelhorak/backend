@@ -3,6 +3,12 @@ use rocket_contrib::json::Json;
 
 use crate::db::NewReservation;
 
+/// vrátí JSON dané rezervace
+///
+/// GET /booking/<id> application/json
+///
+/// parametry:
+/// - `id`: identifikátor dané rezervace
 #[get("/booking/<id>", format = "application/json")]
 pub fn get(id: i32) -> String {
 	rgi! {
@@ -11,6 +17,11 @@ pub fn get(id: i32) -> String {
 	}
 }
 
+/// vrátí JSON dané rezervace
+///
+/// POST /booking application/json
+///
+/// data: [`NewReservation`]
 #[post("/booking", format = "application/json", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>) -> String {
 	rgi! {
@@ -19,6 +30,14 @@ pub fn post(_input: Json<NewReservation>) -> String {
 	}
 }
 
+/// upraví danou rezervaci
+///
+/// PATCH /booking/<id> application/json
+///
+/// parametry:
+/// - `id`: identifikátor dané rezervace
+///
+/// data:[`NewReservation`]
 #[patch("/booking/<id>", format = "application/json", data = "<_input>")]
 pub fn patch(id: i32, _input: Json<NewReservation>) -> String {
 	rgi! {
@@ -28,6 +47,12 @@ pub fn patch(id: i32, _input: Json<NewReservation>) -> String {
 	}
 }
 
+/// vymaže danou rezervaci
+///
+/// DELETE /booking/<id> application/json
+///
+/// parametry:
+/// - `id`: identifikátor dané rezervace
 #[delete("/booking/<id>", format = "application/json")]
 pub fn delete(id: i32) -> String {
 	rgi! {
@@ -41,7 +66,7 @@ pub fn routes() -> Vec<Route> {
 		get,
 		post,
 		patch,
-		delete
+		delete,
 	]
 }
 

@@ -1,13 +1,16 @@
+use std::path::{Path, PathBuf};
 use rocket::response::NamedFile;
 
+/// servuje index
 #[get("/")]
 pub fn index() -> NamedFile {
 	NamedFile::open("frontend/index.html").expect("index.html not found")
 }
 
-#[get("/static/<name>")]
-pub fn frontend(name: String) -> NamedFile {
-	NamedFile::open(format!("frontend/build/{}", name)).expect("file not found")
+/// vrac
+#[get("/static/<name..>")]
+pub fn frontend(name: PathBuf) -> NamedFile {
+	NamedFile::open(Path::new("frontend/build/").join(name)).expect("file not found")
 }
 
 #[catch(404)]

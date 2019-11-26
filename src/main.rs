@@ -1,3 +1,4 @@
+//! ## backend rezervačního systému pro auditorium 
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use]
@@ -10,11 +11,13 @@ extern crate dotenv;
 
 use dotenv::dotenv;
 
-mod rgi;
+pub mod rgi;
 
-mod static_server;
-mod db;
-mod schema;
+pub mod db;
+/// statický webserver pro posílání frontendu
+pub mod static_server;
+/// schména databáze (vygenerováno Dieselem)
+pub mod schema;
 
 use db::DbConn;
 
