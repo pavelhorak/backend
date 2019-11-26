@@ -27,7 +27,7 @@ def get(data):
         return json.dump(result)
 
     else:
-        return json.dump({"error": True})
+        return json.dump({"error": "Dawid Kubis to rozbil"})
 
 
 def post(data):
@@ -56,7 +56,7 @@ def delete(data):
     if len(results) == 1:
         session.delete(results[0])
     else:
-        return json.dump({"error": True})
+        return json.dump({"error": "Delete failed, bitches"})
 
 
 
