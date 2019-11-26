@@ -12,5 +12,5 @@ pub fn frontend(name: String) -> NamedFile {
 
 #[catch(404)]
 pub fn not_found() -> NamedFile {
-	NamedFile::open("fontend/404.html").expect("404.html not found")
+	NamedFile::open("frontend/404.html").expect("404.html not found")
 }
