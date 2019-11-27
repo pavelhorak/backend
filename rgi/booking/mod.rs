@@ -1,12 +1,12 @@
 use rocket::Route;
 use rocket_contrib::json::Json;
 
-use crate::db::NewReservation;
+use crate::db::{NewReservation, UpdateReservation};
 
 /// vrací všechny rezervace
 ///
 /// GET /booking "application/json"
-#[get("/booking", format = "application/json")]
+#[get("/events", format = "application/json")]
 pub fn list() -> String {
 	rgi! {
 		LIST "rgi/booking/booking.py"
@@ -19,7 +19,7 @@ pub fn list() -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[get("/booking/<id>", format = "application/json")]
+#[get("/events/<id>", format = "application/json")]
 pub fn get(id: i32) -> String {
 	rgi! {
 		GET "rgi/booking/booking.py"
@@ -32,7 +32,7 @@ pub fn get(id: i32) -> String {
 /// POST /booking application/json
 ///
 /// data: [`NewReservation`]
-#[post("/booking", format = "application/json", data = "<_input>")]
+#[post("/events", format = "application/json", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>) -> String {
 	rgi! {
 		POST "rgi/booking/booking.py"
@@ -48,7 +48,7 @@ pub fn post(_input: Json<NewReservation>) -> String {
 /// - `id`: identifikátor dané rezervace
 ///
 /// data:[`UpdateReservation`]
-#[patch("/booking/<id>", format = "application/json", data = "<_input>")]
+#[patch("/events/<id>", format = "application/json", data = "<_input>")]
 pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 	rgi! {
 		PATCH "rgi/booking/booking.py"
@@ -63,7 +63,7 @@ pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[delete("/booking/<id>", format = "application/json")]
+#[delete("/events/<id>", format = "application/json")]
 pub fn delete(id: i32) -> String {
 	rgi! {
 		DELETE "rgi/booking/booking.py"
@@ -72,17 +72,17 @@ pub fn delete(id: i32) -> String {
 }
 
 ///
-#[get("/booking/filter/<rooms>/<begin>/<end>", format = "application/json")]
-pub fn filter_date(rooms: Int, begin_time: String, end_time: String) -> String {
+#[get("/events/filter/<rooms>/<begin_time>/<end_time>", format = "application/json")]
+pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
-		arg: rooms
-		arg: begin_time
+		arg: rooms,
+		arg: begin_time,
 		arg: end_time
 	}
 }
 
 /// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![filter_date, list, get, post, patch, delete,]
+	routes![date_filter, list, get, post, patch, delete,]
 }

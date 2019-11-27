@@ -52,6 +52,11 @@ def get(data):
 
 
 def list_(data):
+    """
+    List all the data
+    :param data:
+    :return: {results: array of result}
+    """
     results = session.query(Booking).all()
     return json.dumps({"results": results}, cls=AlchemyEncoder)
 
@@ -65,6 +70,9 @@ def post(data):
 
     result = Booking()
     for key, value in data["data"].items():
+        if value is None:
+            continue
+        print(key, value, file=sys.stderr)
         setattr(result, key, value)
     result.approved = False
 
@@ -79,6 +87,24 @@ def post(data):
     session.add(result)
     session.commit()
     return json.dumps({"result": 0, "id": result.id})
+
+
+def filter(data):
+    """
+    filer data by room flag, begin_time and start_time
+    :param data: roomflag(0/1/2/3), begin_time and start_time
+    :return: {results: array of result}
+    """
+
+    reservations = session.query(Booking).filter(Booking.begin_time <= data["args"]["end_time"]).\
+                                          filter(Booking.end_time <= data["args"]["begin_time"])
+    if data["args"]["rooms"] != 3:
+        reservations.filter(Booking.rooms == data["args"]["rooms"])
+
+    results = reservations.all()
+    return json.dumps({"results": results}, cls=AlchemyEncoder)
+
+
 
 def patch(data):
     """
@@ -108,6 +134,7 @@ def delete(data):
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         session.delete(results[0])
+        session.commit()
         return json.dumps({"result": 0})
     else:
         return json.dumps({"result": 1})  # no result found by the id

@@ -65,3 +65,32 @@ pub struct NewReservation {
 	/// rozložení nábytku v audioriu
 	pub layout: u16,
 }
+
+
+/// Weird quick models
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[allow(dead_code)]
+pub struct UpdateReservation {
+	/// název události
+	pub name: Option<String>,
+	/// popis události
+	pub description: Option<String>,
+	/// "rezervujitel" události :^)
+	pub author: Option<String>,
+	/// místnosti, které si "rezervujitel" přeje zarezervovat
+	///
+	/// funguje na bázi bitflagů:
+	/// ```
+	/// 0b00 -> žádná místnosti (nemělo by se stát :D)
+	/// 0b01 -> north
+	/// 0b10 -> south
+	/// 0b11 -> celé auditorium
+	/// ```
+	pub rooms: Option<u8>,
+	/// počáteční čas rezervace
+	pub begin_time: Option<String>,
+	/// čas, kdy rezervace končí
+	pub end_time: Option<String>,
+	/// rozložení nábytku v audioriu
+	pub layout: Option<u16>,
+}
