@@ -12,9 +12,16 @@ Vrací JSON s následující strukturou
 - end_time
 - layout
 - approved
-
-
-Všechny endpointy:
-  V případě chyby vrátí JSON s atributem error, ve kterém je uložena chybová hláška.
   
-Ostatní endpointy vrací JSON s atributem success, který je buď True, nebo obsahuje chybovou hlášku
+ V případě chyby vrátí JSON s atributem result, který bude označovat chybu
+ 
+ ## Ostatní endpointy
+ Vrací JSON s atributem result, který označuje výsledek nebo chybu
+ 
+ ## Tabulka výsledků
+ result: 0    - všechno fungovalo
+ result: 1    - nenašlo to rezervaci podle ID
+ result: 2    - Už existuje rezervace ve stejném čase a ve stejné místnosti
+
+ 
+ 
