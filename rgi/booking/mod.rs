@@ -76,8 +76,8 @@ pub fn delete(id: i32) -> String {
 pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
-		arg: rooms
-		arg: begin_time
+		arg: rooms,
+		arg: begin_time,
 		arg: end_time
 	}
 }

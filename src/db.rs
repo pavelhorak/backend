@@ -67,6 +67,7 @@ pub struct NewReservation {
 }
 
 
+/// Weird quick models
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(dead_code)]
 pub struct UpdateReservation {
