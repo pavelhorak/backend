@@ -70,6 +70,9 @@ def post(data):
 
     result = Booking()
     for key, value in data["data"].items():
+        if value is None:
+            continue
+        print(key, value, file=sys.stderr)
         setattr(result, key, value)
     result.approved = False
 
@@ -131,6 +134,7 @@ def delete(data):
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         session.delete(results[0])
+        session.commit()
         return json.dumps({"result": 0})
     else:
         return json.dumps({"result": 1})  # no result found by the id

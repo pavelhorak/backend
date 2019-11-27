@@ -6,7 +6,7 @@ use crate::db::{NewReservation, UpdateReservation};
 /// vrací všechny rezervace
 ///
 /// GET /booking "application/json"
-#[get("/booking", format = "application/json")]
+#[get("/events", format = "application/json")]
 pub fn list() -> String {
 	rgi! {
 		LIST "rgi/booking/booking.py"
@@ -19,7 +19,7 @@ pub fn list() -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[get("/booking/<id>", format = "application/json")]
+#[get("/events/<id>", format = "application/json")]
 pub fn get(id: i32) -> String {
 	rgi! {
 		GET "rgi/booking/booking.py"
@@ -32,7 +32,7 @@ pub fn get(id: i32) -> String {
 /// POST /booking application/json
 ///
 /// data: [`NewReservation`]
-#[post("/booking", format = "application/json", data = "<_input>")]
+#[post("/events", format = "application/json", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>) -> String {
 	rgi! {
 		POST "rgi/booking/booking.py"
@@ -48,7 +48,7 @@ pub fn post(_input: Json<NewReservation>) -> String {
 /// - `id`: identifikátor dané rezervace
 ///
 /// data:[`UpdateReservation`]
-#[patch("/booking/<id>", format = "application/json", data = "<_input>")]
+#[patch("/events/<id>", format = "application/json", data = "<_input>")]
 pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 	rgi! {
 		PATCH "rgi/booking/booking.py"
@@ -63,7 +63,7 @@ pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[delete("/booking/<id>", format = "application/json")]
+#[delete("/events/<id>", format = "application/json")]
 pub fn delete(id: i32) -> String {
 	rgi! {
 		DELETE "rgi/booking/booking.py"
@@ -72,7 +72,7 @@ pub fn delete(id: i32) -> String {
 }
 
 ///
-#[get("/booking/filter/<rooms>/<begin_time>/<end_time>", format = "application/json")]
+#[get("/events/filter/<rooms>/<begin_time>/<end_time>", format = "application/json")]
 pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
