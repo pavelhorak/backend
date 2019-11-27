@@ -1,5 +1,6 @@
 //! ## backend rezervačního systému pro auditorium 
 #![feature(proc_macro_hygiene, decl_macro)]
+#![deny(missing_docs)]
 
 #[macro_use]
 extern crate rocket;
@@ -17,6 +18,7 @@ pub mod db;
 /// statický webserver pro posílání frontendu
 pub mod static_server;
 /// schména databáze (vygenerováno Dieselem)
+#[allow(missing_docs)]
 pub mod schema;
 
 use db::DbConn;
