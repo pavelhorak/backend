@@ -5,7 +5,7 @@ use crate::db::{NewReservation, UpdateReservation};
 
 /// vrací všechny rezervace
 ///
-/// GET /booking "application/json"
+/// GET /events "application/json"
 #[get("/events", format = "application/json")]
 pub fn list() -> String {
 	rgi! {
@@ -15,7 +15,7 @@ pub fn list() -> String {
 
 /// vrátí JSON dané rezervace
 ///
-/// GET /booking/<id> application/json
+/// GET /events/<id> application/json
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
@@ -29,7 +29,7 @@ pub fn get(id: i32) -> String {
 
 /// vrátí JSON dané rezervace
 ///
-/// POST /booking application/json
+/// POST /events application/json
 ///
 /// data: [`NewReservation`]
 #[post("/events", format = "application/json", data = "<_input>")]
@@ -42,7 +42,7 @@ pub fn post(_input: Json<NewReservation>) -> String {
 
 /// upraví danou rezervaci
 ///
-/// PATCH /booking/<id> application/json
+/// PATCH /events/<id> application/json
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
@@ -59,7 +59,7 @@ pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 
 /// vymaže danou rezervaci
 ///
-/// DELETE /booking/<id> application/json
+/// DELETE /events/<id> application/json
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
