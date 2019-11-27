@@ -5,8 +5,9 @@ dev: src/* frontend
 	cargo build
 
 frontend: frontend/
-	cd frontend
-	make
+	cd frontend && make
 
 docker: Dockerfile
 	docker build -t cw .
+
+.PHONY: docker frontend

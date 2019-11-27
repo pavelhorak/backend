@@ -2,7 +2,7 @@ FROM archlinux/base
 
 # dependencies
 RUN pacman -Suy --noconfirm rustup make gcc pkgconf sqlite \
-python python-sqlalchemy python-psycopg2
+python python-sqlalchemy yarn
 RUN rustup install nightly
 
 # workdir
