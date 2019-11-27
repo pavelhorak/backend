@@ -58,7 +58,7 @@ def list_(data):
     :return: {results: array of result}
     """
     results = session.query(Booking).all()
-    return json.dumps({"results": results}, cls=AlchemyEncoder)
+    return json.dumps(results, cls=AlchemyEncoder)
 
 
 def post(data):
