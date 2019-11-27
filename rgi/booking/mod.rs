@@ -47,9 +47,9 @@ pub fn post(_input: Json<NewReservation>) -> String {
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 ///
-/// data:[`NewReservation`]
+/// data:[`UpdateReservation`]
 #[patch("/booking/<id>", format = "application/json", data = "<_input>")]
-pub fn patch(id: i32, _input: Json<NewReservation>) -> String {
+pub fn patch(id: i32, _input: Json<UpdateReservation>) -> String {
 	rgi! {
 		PATCH "rgi/booking/booking.py"
 		arg: id
