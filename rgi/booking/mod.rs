@@ -72,8 +72,8 @@ pub fn delete(id: i32) -> String {
 }
 
 ///
-#[get("/booking/events/<rooms>/<begin_time>/<end_time>", format = "application/json")]
-pub fn aaaaaa(rooms: Int, begin_time: String, end_time: String) -> String {
+#[get("/booking/filter/<rooms>/<begin_time>/<end_time>", format = "application/json")]
+pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
 		arg: rooms
@@ -84,5 +84,5 @@ pub fn aaaaaa(rooms: Int, begin_time: String, end_time: String) -> String {
 
 /// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![aaaaaa, list, get, post, patch, delete,]
+	routes![date_filter, list, get, post, patch, delete,]
 }
