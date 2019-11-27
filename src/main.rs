@@ -62,7 +62,11 @@ fn main() {
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
-		.mount("/", routes![static_server::index, static_server::frontend,])
+		.mount("/", routes![
+                    static_server::index,
+                    static_server::frontend,
+                    static_server::favicon,
+                ])
 		.mount("/rgi/", rgi::routes())
 		.attach(DbConn::fairing())
 		.launch();
