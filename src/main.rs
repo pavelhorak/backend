@@ -60,6 +60,16 @@ use db::DbConn;
 
 fn main() {
 	dotenv().ok();
+	let cors = rocket_cors::Cors {
+		allowed_origins: AllowedOrigins::all(),
+		allowed_methods: vec!["options", "delete", "patch", "trace", "post", "get", "put"]
+			.into_iter()
+			.map(|s| FromStr::from_str(s).unwrap_or_else(|_| unreachable!("HTTP methods must be correct")))
+			.collect(),
+		allowed_headers: AllowedHeaders::all(),
+		allow_credentials: true,
+		..Default::default()
+	};
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
@@ -69,6 +79,7 @@ fn main() {
                     static_server::favicon,
                 ])
 		.mount("/rgi/", rgi::routes())
+		.attach(cors)
 		.attach(DbConn::fairing())
 		.launch();
 }
