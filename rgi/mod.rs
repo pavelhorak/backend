@@ -55,7 +55,6 @@ macro_rules! rgi {
 	}
 }
 
-
 /// modul obsahující endpointy pro CRUD na rezervaci
 pub mod booking;
 
