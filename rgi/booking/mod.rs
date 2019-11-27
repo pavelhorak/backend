@@ -72,7 +72,7 @@ pub fn delete(id: i32) -> String {
 }
 
 ///
-#[get("/booking/events/<rooms>/<begin>/<end>", format = "application/json")]
+#[get("/booking/events/<rooms>/<begin_time>/<end_time>", format = "application/json")]
 pub fn aaaaaa(rooms: Int, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
