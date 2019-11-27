@@ -71,13 +71,7 @@ pub fn delete(id: i32) -> String {
 	}
 }
 
+/// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![
-                list,
-		get,
-		post,
-		patch,
-		delete,
-	]
+	routes![list, get, post, patch, delete,]
 }
-

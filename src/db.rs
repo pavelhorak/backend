@@ -11,13 +11,13 @@ pub struct DbConn(diesel::SqliteConnection);
 #[derive(Queryable, Debug, Clone)]
 pub struct Reservation {
 	/// primární klíč
-	pub id:          u16,
+	pub id: u16,
 	/// název události
-	pub name:        String,
+	pub name: String,
 	/// popis události
 	pub description: String,
 	/// "rezervujitel" události :^)
-	pub author:      String,
+	pub author: String,
 	/// místnosti, které si "rezervujitel" přeje zarezervovat
 	///
 	/// funguje na bázi bitflagů:
@@ -27,7 +27,7 @@ pub struct Reservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms:       u8,
+	pub rooms: u8,
 	/// počáteční čas rezervace
 	pub begin_time:  String,
 	/// čas, kdy rezervace končí
@@ -43,11 +43,11 @@ pub struct Reservation {
 #[allow(dead_code)]
 pub struct NewReservation {
 	/// název události
-	pub name:        String,
+	pub name: String,
 	/// popis události
 	pub description: String,
 	/// "rezervujitel" události :^)
-	pub author:      String,
+	pub author: String,
 	/// místnosti, které si "rezervujitel" přeje zarezervovat
 	///
 	/// funguje na bázi bitflagů:
@@ -57,11 +57,11 @@ pub struct NewReservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms:       u8,
+	pub rooms: u8,
 	/// počáteční čas rezervace
-	pub begin_time:  String,
+	pub begin_time: String,
 	/// čas, kdy rezervace končí
-	pub end_time:    String,
+	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout:      u16
+	pub layout: u16,
 }
