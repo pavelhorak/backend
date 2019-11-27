@@ -6,8 +6,7 @@ dev: src/* frontend
 
 frontend: frontend/
 	cd frontend
-	npm i
-	npm run build
+	make
 
 docker: Dockerfile
 	docker build -t cw .
