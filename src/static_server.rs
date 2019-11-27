@@ -30,6 +30,12 @@ pub fn frontend(name: PathBuf) -> NamedFile {
 	NamedFile::open(Path::new("frontend/build/static/").join(name)).expect("file not found")
 }
 
+/// vraci favicon
+#[get("/favicon.ico")]
+pub fn favicon() -> NamedFile {
+    NamedFile::open("frontend/favicon.ico").expect("favicon not found")
+}
+
 /// catcher pro 404
 #[catch(404)]
 pub fn not_found() -> NamedFile {
