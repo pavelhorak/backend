@@ -1,7 +1,7 @@
 # backend
 Backend
 
-## /rgi/booking/<id>
+## /rgi/events/<id>
 Vrací JSON s následující strukturou
 - id
 - name
