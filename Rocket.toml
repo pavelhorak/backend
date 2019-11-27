@@ -1,5 +1,5 @@
 [global.databases]
-postgres_db = { url = "postgres://postgres:heslo@localhost/auditorium_booking" }
+postgres_db = { url = "auditorium_booking.sqlite3" }
 
 [production]
 port = 8000
