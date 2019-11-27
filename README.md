@@ -19,9 +19,9 @@ Vrací JSON s následující strukturou
  Vrací JSON s atributem result, který označuje výsledek nebo chybu
  
  ## Tabulka výsledků
- result: 0    - všechno fungovalo
- result: 1    - nenašlo to rezervaci podle ID
- result: 2    - Už existuje rezervace ve stejném čase a ve stejné místnosti
+ - result: 0    - všechno fungovalo
+ - result: 1    - nenašlo to rezervaci podle ID
+ - result: 2    - Už existuje rezervace ve stejném čase a ve stejné místnosti
 
  
  
