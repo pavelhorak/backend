@@ -25,9 +25,15 @@ pub fn index() -> NamedFile {
 }
 
 /// vrací statické soubory frontendu
-#[get("/fe/<name..>")]
+#[get("/static/<name..>")]
 pub fn frontend(name: PathBuf) -> Option<NamedFile> {
-	NamedFile::open(Path::new("frontend/build/").join(name)).ok()
+	NamedFile::open(Path::new("frontend/build/static/").join(name)).ok()
+}
+
+/// vraci favicon
+#[get("/favicon.ico")]
+pub fn favicon() -> Option<NamedFile> {
+    NamedFile::open("frontend/favicon.ico").ok()
 }
 
 /// catcher pro 404
