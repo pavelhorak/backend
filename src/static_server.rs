@@ -25,9 +25,9 @@ pub fn index() -> NamedFile {
 }
 
 /// vrací statické soubory frontendu
-#[get("/fe/<name..>")]
+#[get("/static/<name..>")]
 pub fn frontend(name: PathBuf) -> NamedFile {
-	NamedFile::open(Path::new("frontend/build/").join(name)).expect("file not found")
+	NamedFile::open(Path::new("frontend/build/static/").join(name)).expect("file not found")
 }
 
 /// catcher pro 404
