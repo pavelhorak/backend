@@ -13,7 +13,7 @@ import re
 Base = automap_base()
 engine = create_engine(os.getenv("DATABASE_URL"))
 Base.prepare(engine, reflect=True)
-Booking = Base.classes.events
+Booking = Base.classes.booking
 session = Session(engine)
 
 
