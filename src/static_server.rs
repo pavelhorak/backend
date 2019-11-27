@@ -26,14 +26,14 @@ pub fn index() -> NamedFile {
 
 /// vrací statické soubory frontendu
 #[get("/static/<name..>")]
-pub fn frontend(name: PathBuf) -> NamedFile {
-	NamedFile::open(Path::new("frontend/build/static/").join(name)).expect("file not found")
+pub fn frontend(name: PathBuf) -> Option<NamedFile> {
+	NamedFile::open(Path::new("frontend/build/static/").join(name)).ok()
 }
 
 /// vraci favicon
 #[get("/favicon.ico")]
-pub fn favicon() -> NamedFile {
-    NamedFile::open("frontend/favicon.ico").expect("favicon not found")
+pub fn favicon() -> Option<NamedFile> {
+    NamedFile::open("frontend/favicon.ico").ok()
 }
 
 /// catcher pro 404
