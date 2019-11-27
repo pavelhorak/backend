@@ -46,6 +46,7 @@ extern crate diesel;
 extern crate dotenv;
 
 use dotenv::dotenv;
+use rocket_cors::{AllowedOrigins, AllowedHeaders};
 
 pub mod rgi;
 pub mod db;
