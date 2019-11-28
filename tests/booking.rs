@@ -4,7 +4,6 @@ extern crate serde_json;
 use rocket::local::Client;
 use rocket::http::ContentType;
 
-
 #[test]
 pub fn test_booking() {
 	let cli = Client::new(backend::init()).expect("wtf? the virtual client failed");

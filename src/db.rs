@@ -29,13 +29,13 @@ pub struct Reservation {
 	/// ```
 	pub rooms: u8,
 	/// počáteční čas rezervace
-	pub begin_time:  String,
+	pub begin_time: String,
 	/// čas, kdy rezervace končí
-	pub end_time:    String,
+	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout:      u8,
+	pub layout: u8,
 	/// zda byla rezervace schválena
-	pub approved:    u8,
+	pub approved: u8,
 	/// počet lidí
 	pub amount: u16,
 }
@@ -69,7 +69,6 @@ pub struct NewReservation {
 	/// počet lidí
 	pub amount: u16,
 }
-
 
 /// Weird quick models
 #[derive(Serialize, Deserialize, Debug, Clone)]
