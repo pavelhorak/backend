@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import base64
 import logging
 import mimetypes
