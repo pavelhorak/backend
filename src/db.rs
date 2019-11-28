@@ -37,7 +37,7 @@ pub struct Reservation {
 	/// zda byla rezervace schválena
 	pub approved: u8,
 	/// počet lidí
-	pub amount: u16,
+	pub people: u16,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -67,7 +67,7 @@ pub struct NewReservation {
 	/// rozložení nábytku v audioriu
 	pub layout: u16,
 	/// počet lidí
-	pub amount: u16,
+	pub people: u16,
 }
 
 /// Weird quick models
@@ -96,6 +96,8 @@ pub struct UpdateReservation {
 	pub end_time: Option<String>,
 	/// rozložení nábytku v audioriu
 	pub layout: Option<u16>,
+	/// počet lidí
+	pub people: Option<u16>,
 }
 
 /// Model usera

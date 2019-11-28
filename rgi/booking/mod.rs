@@ -82,6 +82,7 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	}
 }
 
+///
 #[post("/events/<id>/approve", format = "application/json")]
 pub fn approve(id: i32) -> String {
 	rgi! {
