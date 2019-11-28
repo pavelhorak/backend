@@ -10,3 +10,17 @@ table! {
         approved -> Integer,
     }
 }
+
+table! {
+    users (id) {
+        id -> Integer,
+        name -> Text,
+        email -> Text,
+        role -> Text,
+    }
+}
+
+allow_tables_to_appear_in_same_query!(
+    booking,
+    users,
+);

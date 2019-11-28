@@ -6,7 +6,7 @@
 //! - [`not_found`] -> 404 soubor
 //!
 //! přidání nové statické routy:
-//! ```rust,no_run
+//! ```no_run
 //! #[get("/url/<path..>")]
 //! pub fn moje_route(path: PathBuf) -> NamedFile {
 //!     NamedFile::open(Path::new("cesta/ke/slozce/").join(path))
