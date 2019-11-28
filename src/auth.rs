@@ -1,17 +1,46 @@
-use rocket::request::{FromRequest, Request};
-use rocket::Outcome;
+//! modul s autentifikačními funkcemi
+
+use serde::{Deserialize, Serialize};
+
+use rocket::request::{FromRequest, Request, Outcome};
 use rocket::http::Status;
 
-pub struct Userman {
-    id: u16,
-    name: String,
-    email: String,
+use base64::{encode, decode};
+
+/// autorizační token
+#[derive(Serialize, Deserialize, )]
+pub struct AuthToken {
+	/// jméno uživatele
+	name: String,
+	/// email uživatele
+	email: String,
 }
 
-impl<'a, 'r> FromRequest<'a, 'r> for Userman {
+impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
     type Error = String;
 
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        unimplemented!();
+    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
+		let keys: Vec<_> = request.headers().get("Authorization").collect();
+		match keys.get(0).unwrap_or(&"").split(' ').nth(1) {
+			Some(ref token) => {
+				let body = match decode(token) {
+					Ok(bod) => bod,
+					Err(_) => return Outcome::Failure((Status::UnprocessableEntity, "authtoken is not a correct base64 string".to_string())),
+				};
+				
+				let token = match serde_json::from_str(&String::from_utf8_lossy(&body).to_string()) {
+					Ok(tok) => tok,
+					Err(e) => return Outcome::Failure((Status::UnprocessableEntity, format!("can't parse JSON into struct: {}", e.to_string()))) 
+				};
+				
+				//... pošéfit databázi zde
+
+				Outcome::Success(token)
+			}
+			x => {
+				println!("{:?}", x);
+				Outcome::Failure((Status::BadRequest, "invalid authorization header".to_string()))
+			}
+		}
     }
 }

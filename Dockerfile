@@ -2,7 +2,7 @@ FROM archlinux/base
 
 # dependencies
 RUN pacman -Suy --noconfirm rustup make gcc pkgconf sqlite \
-python python-sqlalchemy yarn
+python python-sqlalchemy yarn google-api-python-client google_auth_oauthlib apiclient
 RUN rustup install nightly
 
 # workdir
