@@ -47,10 +47,7 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
-        q = json.dumps(results[0], cls=AlchemyEncoder)
-        print("="*30, file=sys.stderr)
-        print(q, file=sys.stderr)
-        return q
+        return json.dumps(results[0], cls=AlchemyEncoder)
     else:
         return json.dumps({"result": 1})
 
@@ -76,13 +73,12 @@ def post(data):
     for key, value in data["data"].items():
         if value is None:
             continue
-        print(key, value, file=sys.stderr)
         setattr(result, key, value)
     result.approved = False
 
     events = session.query(Booking).filter(Booking.approved == 1).\
                                     filter(Booking.begin_time <= result.end_time).\
-                                    filter(Booking.end_time <= result.begin_time)
+                                    filter(Booking.end_time >= result.begin_time)
     for event in events:
         if event.rooms == 3:
             return json.dumps({"result": 2})
@@ -146,15 +142,23 @@ def delete(data):
 
 def approve(data):
     """
-    Deletes event by it's id
+    Approvs event by it's id
     :param data: {id}
-    :return: {result: number}
+    :return: ?
     """
 
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
         result = results[0]
-        setattr(result, "approved", 1)
+        events = session.query(Booking).filter(Booking.approved == 1).\
+                                    filter(Booking.begin_time <= result.end_time).\
+                                    filter(Booking.end_time >= result.begin_time)
+        for event in events:
+            if event.rooms == 3:
+                return json.dumps({"result": 2})
+            elif event.rooms == result.rooms:
+                return json.dumps({"result": 2})
+        result.approved = 1
         session.add(result)
         session.commit()
         return json.dumps({"result": 0})
