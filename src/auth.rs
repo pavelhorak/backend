@@ -12,6 +12,7 @@ use diesel::prelude::*;
 use std::env;
 use std::marker::PhantomData;
 
+use crate::db;
 use crate::db::{NewUser, User};
 
 /// autorizační token, tak jak je přijat
@@ -104,9 +105,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 
 				//... pošéfit databázi zde
 
-				let connection =
-					SqliteConnection::establish(&env::var("DATABASE_URL").expect("DATABASE_URL not in env"))
-						.expect("error connection to db");
+				let connection = db::get_con();
 
 				let result = users
 					.filter(email.eq(&token.email))

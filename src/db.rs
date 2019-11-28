@@ -3,17 +3,25 @@
 
 use rocket_contrib::databases::diesel;
 use serde::{Serialize, Deserialize};
+use diesel::Connection;
 
+use std::env;
 use crate::schema::*;
 
 #[database("postgres_db")]
 pub struct DbConn(diesel::SqliteConnection);
 
+/// vrací připojení k databázi
+pub fn get_con() -> diesel::SqliteConnection {
+	diesel::SqliteConnection::establish(&env::var("DATABASE_URL").expect("DATABASE_URL not in env"))
+		.expect("error connecting to db")
+}
+
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Queryable, Debug, Clone, Serialize, Deserialize)]
 pub struct Reservation {
 	/// primární klíč
-	pub id: u16,
+	pub id: i32,
 	/// název události
 	pub name: String,
 	/// popis události
@@ -29,17 +37,17 @@ pub struct Reservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms: u8,
+	pub rooms: i32,
 	/// počáteční čas rezervace
 	pub begin_time: String,
 	/// čas, kdy rezervace končí
 	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout: u8,
+	pub layout: i32,
 	/// zda byla rezervace schválena
-	pub approved: u8,
+	pub approved: i32,
 	/// počet lidí
-	pub people: u16,
+	pub people: i32,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -50,8 +58,6 @@ pub struct NewReservation {
 	pub name: String,
 	/// popis události
 	pub description: String,
-	/// "rezervujitel" události :^)
-	pub author: String,
 	/// místnosti, které si "rezervujitel" přeje zarezervovat
 	///
 	/// funguje na bázi bitflagů:
@@ -80,8 +86,6 @@ pub struct UpdateReservation {
 	pub name: Option<String>,
 	/// popis události
 	pub description: Option<String>,
-	/// "rezervujitel" události :^)
-	pub author: Option<String>,
 	/// místnosti, které si "rezervujitel" přeje zarezervovat
 	///
 	/// funguje na bázi bitflagů:

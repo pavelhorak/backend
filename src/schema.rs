@@ -3,12 +3,13 @@ table! {
 		id -> Integer,
 		name -> Text,
 		description -> Text,
+		author -> Text,
 		rooms -> Integer,
 		begin_time -> Text,
 		end_time -> Text,
 		layout -> Integer,
 		approved -> Integer,
-		people -> Nullable<Integer>,
+		people -> Integer,
 	}
 }
 
