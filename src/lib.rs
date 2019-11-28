@@ -53,6 +53,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 use rocket_cors::{AllowedOrigins, AllowedHeaders};
 use std::str::FromStr;
+
+pub mod auth;
 pub mod rgi;
 pub mod db;
 pub mod static_server;
