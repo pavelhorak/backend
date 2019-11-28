@@ -4,6 +4,8 @@
 use rocket_contrib::databases::diesel;
 use serde::{Serialize, Deserialize};
 
+use crate::schema::*;
+
 #[database("postgres_db")]
 pub struct DbConn(diesel::SqliteConnection);
 
@@ -101,15 +103,26 @@ pub struct UpdateReservation {
 }
 
 /// Model usera
-#[derive(Serialize, Deserialize, Debug, Clone, Queryable, Insertable)]
+#[derive(Serialize, Deserialize, Debug, Clone, Queryable)]
 #[allow(dead_code)]
 pub struct User {
 	/// identifikátor
-	pub id: u16,
+	pub id: i32,
 	/// jméno uživatele
 	pub name: String,
 	/// email
 	pub email: String,
 	/// role
 	pub role: String,
+}
+
+/// Model usera pro vložení do databáze
+#[derive(Serialize, Deserialize, Debug, Clone, Insertable)]
+#[table_name = "users"]
+#[allow(dead_code)]
+pub struct NewUser {
+	/// jmeno
+	pub name: String,
+	/// email
+	pub email: String,
 }
