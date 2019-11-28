@@ -46,6 +46,9 @@ def get_service():
     service = build('gmail', 'v1', credentials=creds)
     return service
 
+
+Service = get_service()
+
 def send_message(service, sender, message):
   """Send an email message.
 
@@ -86,6 +89,7 @@ http://docs.python.org/lib/module-smtplib.html
   b = base64.urlsafe_b64encode(s.encode('utf-8'))
   return {'raw': b.decode('utf-8')}
 
+<<<<<<< Updated upstream
 
 def send_user_approval(sender, to, auditorium, time_start, time_end):
 
@@ -145,6 +149,22 @@ def send_user_denial(sender, to, auditorium, time_start, time_end):
     _service = get_service()
     _message = create_message(sender, to, subject, text)
     send_message(_service, sender, _message)
+=======
+def send_request(booker, approver, auditorium, time_start, time_end):
+    """Sends request for the approval of booking.
+    Args:
+        sender: Email address of the booker (sender)
+        to: Email address of the approver (administrator)
+    Returns:
+        None(Sends request.)
+        """
+    sub_request = ""
+    text_request = ""
+
+
+    Message = create_message(booker, approver, sub_request, text_request)
+    send_message(Service, booker, Message)
+>>>>>>> Stashed changes
 
 if __name__ == '__main__':
     logging.basicConfig(
@@ -160,3 +180,5 @@ if __name__ == '__main__':
     except Exception as e:
         logging.error(e)
         raise
+
+
