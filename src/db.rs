@@ -8,7 +8,7 @@ use serde::{Serialize, Deserialize};
 pub struct DbConn(diesel::SqliteConnection);
 
 /// Model rezervace, tak jak je uložena v databázi
-#[derive(Queryable, Debug, Clone)]
+#[derive(Queryable, Debug, Clone, Serialize, Deserialize)]
 pub struct Reservation {
 	/// primární klíč
 	pub id: u16,
