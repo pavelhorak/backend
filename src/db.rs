@@ -36,6 +36,8 @@ pub struct Reservation {
 	pub layout:      u8,
 	/// zda byla rezervace schválena
 	pub approved:    u8,
+	/// počet lidí
+	pub amount: u16,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -64,6 +66,8 @@ pub struct NewReservation {
 	pub end_time: String,
 	/// rozložení nábytku v audioriu
 	pub layout: u16,
+	/// počet lidí
+	pub amount: u16,
 }
 
 
@@ -93,4 +97,18 @@ pub struct UpdateReservation {
 	pub end_time: Option<String>,
 	/// rozložení nábytku v audioriu
 	pub layout: Option<u16>,
+}
+
+/// Model usera
+#[derive(Serialize, Deserialize, Debug, Clone, Queryable)]
+#[allow(dead_code)]
+pub struct User {
+	/// identifikátor
+	pub id: u16,
+	/// jméno uživatele
+	pub name: String,
+	/// email
+	pub email: String,
+	/// role
+	pub role: String,
 }
