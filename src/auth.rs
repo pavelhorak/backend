@@ -43,7 +43,15 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
                                 let connection = SqliteConnection::establish(&env::var("DATABASE_URL")
                                     .expect("DATABASE_URL not in env")
                                     ).expect("error connection to db");
-                                
+
+                                let result = users.filter(email.eq(&token.email))
+                                    .first::<User>(&connection)
+                                    .expect("failed to connect to db")
+                                    .unwrap_or(|| {
+                                        User {
+                                            id: 
+                                        }
+                                    });
 
 				Outcome::Success(token)
 			}

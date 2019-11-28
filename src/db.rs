@@ -101,7 +101,7 @@ pub struct UpdateReservation {
 }
 
 /// Model usera
-#[derive(Serialize, Deserialize, Debug, Clone, Queryable)]
+#[derive(Serialize, Deserialize, Debug, Clone, Queryable, Insertable)]
 #[allow(dead_code)]
 pub struct User {
 	/// identifikátor
