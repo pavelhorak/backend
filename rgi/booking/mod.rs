@@ -9,6 +9,10 @@ use crate::db::{NewReservation, UpdateReservation, Reservation};
 
 use diesel::prelude::*;
 
+/*
+** TODO proper type for response, handle RGI responses
+*/
+
 /// vrací všechny rezervace
 ///
 /// GET /events "application/json"

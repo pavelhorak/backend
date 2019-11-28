@@ -9,7 +9,6 @@ use base64::decode;
 
 use diesel::prelude::*;
 
-use std::env;
 use std::marker::PhantomData;
 
 use crate::db;
