@@ -10,8 +10,7 @@ use base64::{encode, decode};
 use diesel::prelude::*;
 use std::env;
 
-mod db;
-use db::User;
+use super::db::User;
 
 /// autorizační token
 #[derive(Serialize, Deserialize, )]
@@ -41,7 +40,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
 				
 				//... pošéfit databázi zde
 
-                                let connection = SqliteConnection::establish(env::var("DATABASE_URL")
+                                let connection = SqliteConnection::establish(&env::var("DATABASE_URL")
                                     .expect("DATABASE_URL not in env"))
                                     .expect("error connection to db");
                                 
