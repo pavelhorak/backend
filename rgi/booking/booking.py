@@ -48,7 +48,7 @@ def get(data):
     if len(results) == 1:
         return json.dumps(results[0], cls=AlchemyEncoder)
     else:
-        return json.dumps({"result": 0})
+        return json.dumps({"result": 1})
 
 
 def list_(data):
