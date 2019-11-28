@@ -8,14 +8,18 @@ use rocket::http::Status;
 use base64::{encode, decode};
 
 use diesel::prelude::*;
+use std::env;
+
+mod db;
+use db::User;
 
 /// autorizační token
 #[derive(Serialize, Deserialize, )]
 pub struct AuthToken {
-	/// jméno uživatele
-	name: String,
-	/// email uživatele
-	email: String,
+    /// jméno uživatele
+    pub name: String,
+    /// email uživatele
+    pub email: String,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
@@ -36,6 +40,11 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
 				};
 				
 				//... pošéfit databázi zde
+
+                                let connection = SqliteConnection::establish(env::var("DATABASE_URL")
+                                    .expect("DATABASE_URL not in env"))
+                                    .expect("error connection to db");
+                                
 
 				Outcome::Success(token)
 			}
