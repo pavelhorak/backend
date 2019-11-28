@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
+#from mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
@@ -79,8 +80,7 @@ def post(data):
         setattr(result, key, value)
     result.approved = False
 
-    if __name__ == '__main__':
-        events = session.query(Booking).filter(Booking.approved == True).\
+    events = session.query(Booking).filter(Booking.approved == True).\
                                     filter(Booking.begin_time <= result.end_time).\
                                     filter(Booking.end_time <= result.begin_time)
     for event in events:
