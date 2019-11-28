@@ -11,6 +11,7 @@ from googleapiclient import errors
 from googleapiclient.discovery import build
 
 def get_service():
+
     """Gets an authorized Gmail API service instance.
 
     Returns:
@@ -73,7 +74,7 @@ def create_message(sender, to, subject, message_text):
     to: Email address of the receiver.
     subject: The subject of the email message.
     message_text: The text of the email message.
-
+http://docs.python.org/lib/module-smtplib.html
   Returns:
     An object containing a base64url encoded email object.
   """
@@ -84,6 +85,66 @@ def create_message(sender, to, subject, message_text):
   s = message.as_string()
   b = base64.urlsafe_b64encode(s.encode('utf-8'))
   return {'raw': b.decode('utf-8')}
+
+
+def send_user_approval(sender, to, auditorium, time_start, time_end):
+
+    """
+    Pošle email o schválení rezervace na základě zadaných parametrů
+    :param sender: adresa odesílatele
+    :param to: adresa příjemce
+    :param auditorium:
+    1 - Auditorium South
+    2 - Auditorium North
+    3 - Both
+    :param time_start: string ve kterém je čas začátku rezervace
+    :param time_end: string ve kterém je čas konce rezervace
+    """
+
+    subject = "Approval of your booking of auditorium"
+
+    if auditorium == 1:
+        text_auditorium = "Auditorium South"
+    elif auditorium == 2:
+        text_auditorium = "Auditorium North"
+    else:
+        text_auditorium = "Auditorium South and Auditorium North"
+
+    text = "Your reservation of {} from {} to {} has been approved!".format(text_auditorium, time_start, time_end)
+
+    _service = get_service()
+    _message = create_message(sender, to, subject, text)
+    send_message(_service, sender, _message)
+
+
+def send_user_denial(sender, to, auditorium, time_start, time_end):
+
+    """
+        Pošle email o zamítnutí rezervace na základě zadaných parametrů
+        :param sender: adresa odesílatele
+        :param to: adresa příjemce
+        :param auditorium:
+        1 - Auditorium South
+        2 - Auditorium North
+        3 - Both
+        :param time_start: string ve kterém je čas začátku rezervace
+        :param time_end: string ve kterém je čas konce rezervace
+    """
+
+    subject = "Denial of your booking of auditorium"
+
+    if auditorium == 1:
+        text_auditorium = "Auditorium South"
+    elif auditorium == 2:
+        text_auditorium = "Auditorium North"
+    else:
+        text_auditorium = "Auditorium South and Auditorium North"
+
+    text = "Your reservation of {} from {} to {} has been approved!".format(text_auditorium, time_start, time_end)
+
+    _service = get_service()
+    _message = create_message(sender, to, subject, text)
+    send_message(_service, sender, _message)
 
 if __name__ == '__main__':
     logging.basicConfig(
