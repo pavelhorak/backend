@@ -46,7 +46,10 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
-        return json.dumps(results[0], cls=AlchemyEncoder)
+        q = json.dumps(results[0], cls=AlchemyEncoder)
+        print("="*30, file=sys.stderr)
+        print(q, file=sys.stderr)
+        return q
     else:
         return json.dumps({"result": 1})
 
