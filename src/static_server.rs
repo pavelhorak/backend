@@ -33,7 +33,7 @@ pub fn frontend(name: PathBuf) -> Option<NamedFile> {
 /// vraci favicon
 #[get("/favicon.ico")]
 pub fn favicon() -> Option<NamedFile> {
-    NamedFile::open("frontend/favicon.ico").ok()
+	NamedFile::open("frontend/favicon.ico").ok()
 }
 
 /// catcher pro 404
