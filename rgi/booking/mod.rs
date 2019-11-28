@@ -82,7 +82,15 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	}
 }
 
+#[post("/events/<id>/approve", format = "application/json")]
+pub fn approve(id: i32) -> String {
+	rgi! {
+		APPROVE "rgi/booking/booking.py"
+		arg: id
+	}
+}
+
 /// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![date_filter, list, get, post, patch, delete,]
+	routes![date_filter, list, approve, get, post, patch, delete,]
 }
