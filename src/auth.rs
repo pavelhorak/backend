@@ -7,6 +7,8 @@ use rocket::http::Status;
 
 use base64::{encode, decode};
 
+use diesel::prelude::*;
+
 /// autorizační token
 #[derive(Serialize, Deserialize, )]
 pub struct AuthToken {
