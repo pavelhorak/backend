@@ -8,6 +8,7 @@ table! {
         end_time -> Text,
         layout -> Integer,
         approved -> Integer,
+        people -> Nullable<Integer>,
     }
 }
 
