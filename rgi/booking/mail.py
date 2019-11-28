@@ -10,11 +10,11 @@ from google.auth.transport.requests import Request
 from googleapiclient import errors
 from googleapiclient.discovery import build
 
+
 def get_service():
+    """Get an authorized Gmail API service instance.
 
-    """Gets an authorized Gmail API service instance.
-
-    Returns:
+    Return:
         An authorized Gmail API service instance..
     """
 
@@ -58,36 +58,35 @@ def send_message(service, sender, message):
     can be used to indicate the authenticated user.
     message: Message to be sent.
 
-  Returns:
+  Return:
     Sent Message.
   """
   try:
-    sent_message = (service.users().messages().send(userId=sender, body=message)
-               .execute())
-    logging.info('Message Id: %s', sent_message['id'])
-    return sent_message
+      sent_message = (service.users().messages().send(userId=sender, body=message).execute())
+      logging.info('Message Id: %s', sent_message['id'])
+      return sent_message
   except errors.HttpError as error:
-    logging.error('An HTTP error occurred: %s', error)
+      logging.error('An HTTP error occurred: %s', error)
 
 def create_message(sender, to, subject, message_text):
-  """Create a message for an email.
-
-  Args:
-    sender: Email address of the sender.
-    to: Email address of the receiver.
-    subject: The subject of the email message.
-    message_text: The text of the email message.
-http://docs.python.org/lib/module-smtplib.html
-  Returns:
-    An object containing a base64url encoded email object.
-  """
-  message = MIMEText(message_text)
-  message['to'] = to
-  message['from'] = sender
-  message['subject'] = subject
-  s = message.as_string()
-  b = base64.urlsafe_b64encode(s.encode('utf-8'))
-  return {'raw': b.decode('utf-8')}
+    """Create a message for an email.
+  
+    Args:
+      sender: Email address of the sender.
+      to: Email address of the receiver.
+      subject: The subject of the email message.
+      message_text: The text of the email message.
+    http://docs.python.org/lib/module-smtplib.html
+    Return:
+      An object containing a base64url encoded email object.
+    """
+    message = MIMEText(message_text)
+    message['to'] = to
+    message['from'] = sender
+    message['subject'] = subject
+    s = message.as_string()
+    b = base64.urlsafe_b64encode(s.encode('utf-8'))
+    return {'raw': b.decode('utf-8')}
 
 def send_user_approval(sender, to, auditorium, time_start, time_end):
 
@@ -120,17 +119,16 @@ def send_user_approval(sender, to, auditorium, time_start, time_end):
 
 
 def send_user_denial(sender, to, auditorium, time_start, time_end):
-
     """
-        Pošle email o zamítnutí rezervace na základě zadaných parametrů
-        :param sender: adresa odesílatele
-        :param to: adresa příjemce
-        :param auditorium:
-        1 - Auditorium South
-        2 - Auditorium North
-        3 - Both
-        :param time_start: string ve kterém je čas začátku rezervace
-        :param time_end: string ve kterém je čas konce rezervace
+    Pošle email o zamítnutí rezervace na základě zadaných parametrů
+    :param sender: adresa odesílatele
+    :param to: adresa příjemce
+    :param auditorium:
+    1 - Auditorium South
+    2 - Auditorium North
+    3 - Both
+    :param time_start: string ve kterém je čas začátku rezervace
+    :param time_end: string ve kterém je čas konce rezervace
     """
 
     subject = "Denial of your booking of auditorium"
@@ -149,13 +147,14 @@ def send_user_denial(sender, to, auditorium, time_start, time_end):
     send_message(service, sender, message)
 
 def send_request(booker, approver, auditorium, time_start, time_end):
-    """Sends request for the approval of booking.
+    """
+    Send request for the approval of booking.
     Args:
         sender: Email address of the booker (sender)
         to: Email address of the approver (administrator)
         time_start: Starting time of reservation
         time_end: Ending time of reservation
-    Returns:
+    Return:
         None(Sends request.)
         """
     if auditorium == 1:
