@@ -9,7 +9,7 @@ use rocket::Route;
 /// makro, které vygeneruje boilerplate pro volání daného rgi
 ///
 /// syntaxe (hranaté závorky značí, že parametr není povinný):
-/// ```rust
+/// ```rust,no_run
 /// rgi! {
 ///     HTTP_METODA "rgi/cesta/k/rgi/binarce"
 ///     [arg: identifikátor]* // argumentem se myslí parametr z URL
