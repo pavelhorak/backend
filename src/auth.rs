@@ -30,28 +30,37 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
 			Some(ref token) => {
 				let body = match decode(token) {
 					Ok(bod) => bod,
-					Err(_) => return Outcome::Failure((Status::UnprocessableEntity, "authtoken is not a correct base64 string".to_string())),
+					Err(_) =>
+						return Outcome::Failure((
+							Status::UnprocessableEntity,
+							"authtoken is not a correct base64 string".to_string(),
+						)),
 				};
 
 				let token = match serde_json::from_str(&String::from_utf8_lossy(&body).to_string()) {
 					Ok(tok) => tok,
-					Err(e) => return Outcome::Failure((Status::UnprocessableEntity, format!("can't parse JSON into struct: {}", e.to_string()))),
+					Err(e) =>
+						return Outcome::Failure((
+							Status::UnprocessableEntity,
+							format!("can't parse JSON into struct: {}", e.to_string()),
+						)),
 				};
 
 				//... pošéfit databázi zde
 
-                                let connection = SqliteConnection::establish(&env::var("DATABASE_URL")
-                                    .expect("DATABASE_URL not in env")
-                                    ).expect("error connection to db");
+				let connection =
+					SqliteConnection::establish(&env::var("DATABASE_URL").expect("DATABASE_URL not in env"))
+						.expect("error connection to db");
 
-                                let result = users.filter(email.eq(&token.email))
-                                    .first::<User>(&connection)
-                                    .expect("failed to connect to db")
-                                    .unwrap_or(|| {
-                                        User {
-                                            id: 
-                                        }
-                                    });
+				let result = users
+					.filter(email.eq(&token.email))
+					.first::<User>(&connection)
+					.expect("failed to connect to db")
+					.unwrap_or(|| {
+						/*User {
+							id:
+						}*/
+					});
 
 				Outcome::Success(token)
 			}
