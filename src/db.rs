@@ -8,7 +8,7 @@ use serde::{Serialize, Deserialize};
 pub struct DbConn(diesel::SqliteConnection);
 
 /// Model rezervace, tak jak je uložena v databázi
-#[derive(Queryable, Debug, Clone)]
+#[derive(Queryable, Debug, Clone, Serialize, Deserialize)]
 pub struct Reservation {
 	/// primární klíč
 	pub id: u16,
@@ -29,13 +29,15 @@ pub struct Reservation {
 	/// ```
 	pub rooms: u8,
 	/// počáteční čas rezervace
-	pub begin_time:  String,
+	pub begin_time: String,
 	/// čas, kdy rezervace končí
-	pub end_time:    String,
+	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout:      u8,
+	pub layout: u8,
 	/// zda byla rezervace schválena
-	pub approved:    u8,
+	pub approved: u8,
+	/// počet lidí
+	pub people: u16,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -64,8 +66,9 @@ pub struct NewReservation {
 	pub end_time: String,
 	/// rozložení nábytku v audioriu
 	pub layout: u16,
+	/// počet lidí
+	pub people: u16,
 }
-
 
 /// Weird quick models
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -93,4 +96,20 @@ pub struct UpdateReservation {
 	pub end_time: Option<String>,
 	/// rozložení nábytku v audioriu
 	pub layout: Option<u16>,
+	/// počet lidí
+	pub people: Option<u16>,
+}
+
+/// Model usera
+#[derive(Serialize, Deserialize, Debug, Clone, Queryable)]
+#[allow(dead_code)]
+pub struct User {
+	/// identifikátor
+	pub id: u16,
+	/// jméno uživatele
+	pub name: String,
+	/// email
+	pub email: String,
+	/// role
+	pub role: String,
 }

@@ -53,6 +53,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 use rocket_cors::{AllowedOrigins, AllowedHeaders};
 use std::str::FromStr;
+
+pub mod auth;
 pub mod rgi;
 pub mod db;
 pub mod static_server;
@@ -62,7 +64,6 @@ pub mod static_server;
 pub mod schema;
 
 use db::DbConn;
-
 
 /// Vrací instanci Rocketu
 pub fn init() -> rocket::Rocket {
@@ -80,11 +81,7 @@ pub fn init() -> rocket::Rocket {
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
-		.mount("/", routes![
-                    static_server::index,
-                    static_server::frontend,
-                    static_server::favicon,
-                ])
+		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon,])
 		.mount("/rgi/", rgi::routes())
 		.attach(cors)
 		.attach(DbConn::fairing())

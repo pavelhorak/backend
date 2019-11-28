@@ -89,8 +89,6 @@ http://docs.python.org/lib/module-smtplib.html
   b = base64.urlsafe_b64encode(s.encode('utf-8'))
   return {'raw': b.decode('utf-8')}
 
-<<<<<<< Updated upstream
-
 def send_user_approval(sender, to, auditorium, time_start, time_end):
 
     """
@@ -108,17 +106,17 @@ def send_user_approval(sender, to, auditorium, time_start, time_end):
     subject = "Approval of your booking of auditorium"
 
     if auditorium == 1:
-        text_auditorium = "Auditorium South"
-    elif auditorium == 2:
         text_auditorium = "Auditorium North"
+    elif auditorium == 2:
+        text_auditorium = "Auditorium South"
     else:
         text_auditorium = "Auditorium South and Auditorium North"
 
     text = "Your reservation of {} from {} to {} has been approved!".format(text_auditorium, time_start, time_end)
 
-    _service = get_service()
-    _message = create_message(sender, to, subject, text)
-    send_message(_service, sender, _message)
+    service = get_service()
+    message = create_message(sender, to, subject, text)
+    send_message(service, sender, message)
 
 
 def send_user_denial(sender, to, auditorium, time_start, time_end):
@@ -138,47 +136,41 @@ def send_user_denial(sender, to, auditorium, time_start, time_end):
     subject = "Denial of your booking of auditorium"
 
     if auditorium == 1:
-        text_auditorium = "Auditorium South"
-    elif auditorium == 2:
         text_auditorium = "Auditorium North"
+    elif auditorium == 2:
+        text_auditorium = "Auditorium South"
     else:
         text_auditorium = "Auditorium South and Auditorium North"
 
     text = "Your reservation of {} from {} to {} has been approved!".format(text_auditorium, time_start, time_end)
 
-    _service = get_service()
-    _message = create_message(sender, to, subject, text)
-    send_message(_service, sender, _message)
-=======
+    service = get_service()
+    message = create_message(sender, to, subject, text)
+    send_message(service, sender, message)
+
 def send_request(booker, approver, auditorium, time_start, time_end):
     """Sends request for the approval of booking.
     Args:
         sender: Email address of the booker (sender)
         to: Email address of the approver (administrator)
+        time_start: Starting time of reservation
+        time_end: Ending time of reservation
     Returns:
         None(Sends request.)
         """
-    sub_request = ""
-    text_request = ""
+    if auditorium == 1:
+        text_auditorium = "North"
 
+    elif auditorium == 2:
+        text_auditorium = "South"
+    else:
+        text_auditorium = "North and South"
 
-    Message = create_message(booker, approver, sub_request, text_request)
-    send_message(Service, booker, Message)
->>>>>>> Stashed changes
+    sub_request = "Approval Request"
+    text_request = "I would like to reserve {} from {} to {}, please.". format(text_auditorium, time_start, time_end)
 
-if __name__ == '__main__':
-    logging.basicConfig(
-        format="[%(levelname)s] %(message)s",
-        level=logging.INFO
-    )
-
-    try:
-        service = get_service()
-        message = create_message("from@gmail.com", "to@gmail.com", "Test subject", "Test body")
-        send_message(service, "from@gmail.com", message)
-
-    except Exception as e:
-        logging.error(e)
-        raise
+    service = get_service()
+    message = create_message(booker, approver, sub_request, text_request)
+    send_message(service, booker, message)
 
 

@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
+#from mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
@@ -46,7 +47,10 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
-        return json.dumps(results[0], cls=AlchemyEncoder)
+        q = json.dumps(results[0], cls=AlchemyEncoder)
+        print("="*30, file=sys.stderr)
+        print(q, file=sys.stderr)
+        return q
     else:
         return json.dumps({"result": 1})
 
@@ -76,7 +80,8 @@ def post(data):
         setattr(result, key, value)
     result.approved = False
 
-    events = session.query(Booking).filter(Booking.begin_time <= result.end_time).\
+    events = session.query(Booking).filter(Booking.approved == 1).\
+                                    filter(Booking.begin_time <= result.end_time).\
                                     filter(Booking.end_time <= result.begin_time)
     for event in events:
         if event.rooms == 3:
@@ -139,8 +144,25 @@ def delete(data):
     else:
         return json.dumps({"result": 1})  # no result found by the id
 
+def approve(data):
+    """
+    Deletes event by it's id
+    :param data: {id}
+    :return: {result: number}
+    """
 
-methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete}
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
+    if len(results) == 1:
+        result = results[0]
+        setattr(result, "approved", 1)
+        session.add(result)
+        session.commit()
+        return json.dumps({"result": 0})
+    else:
+        return json.dumps({"result": 1})  # no result found by the id
+
+
+methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete, "approve" : approve}
 txt = sys.stdin.read()
 txt = re.sub(",[ \t\r\n]+}", "}", txt)
 txt = re.sub(",[ \t\r\n]+\]", "]", txt)
