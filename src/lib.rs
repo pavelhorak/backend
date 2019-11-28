@@ -63,7 +63,6 @@ pub mod schema;
 
 use db::DbConn;
 
-
 /// Vrací instanci Rocketu
 pub fn init() -> rocket::Rocket {
 	dotenv().ok();
@@ -80,11 +79,7 @@ pub fn init() -> rocket::Rocket {
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
-		.mount("/", routes![
-                    static_server::index,
-                    static_server::frontend,
-                    static_server::favicon,
-                ])
+		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon,])
 		.mount("/rgi/", rgi::routes())
 		.attach(cors)
 		.attach(DbConn::fairing())

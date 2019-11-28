@@ -2,8 +2,7 @@ use rocket::request::{FromRequest, Request};
 use rocket::Outcome;
 use rocket::http::Status;
 
-
-struct Userman {
+pub struct Userman {
     id: u16,
     name: String,
     email: String,
