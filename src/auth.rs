@@ -35,10 +35,7 @@ pub struct AuthToken<T: roles::Role> {
 impl<T: roles::Role> AuthToken<T> {
 	/// sestrojí nový AuthToken z instace [`User`]
 	pub fn from_user(user: User) -> Self {
-		AuthToken {
-			user,
-			_m: PhantomData,
-		}
+		AuthToken { user, _m: PhantomData }
 	}
 }
 
@@ -54,10 +51,12 @@ pub mod roles {
 		/// jméno role jako string
 		fn name() -> &'static str;
 		/// jméno rodiše jako string
-		fn daddy() -> Option<&'static str> { None }
+		fn daddy() -> Option<&'static str> {
+			None
+		}
 	}
 
-	 macro_rules! role_gen {
+	macro_rules! role_gen {
 		{$($role:ident $(-> $daddy:ident)?)*} => {
 			$(
 				pub struct $role;
@@ -69,11 +68,11 @@ pub mod roles {
 		}
 	 }
 
-	 role_gen! {
-		Noob
-		Approver
-		FacilityManager
-	 }
+	role_gen! {
+	   Noob
+	   Approver
+	   FacilityManager
+	}
 }
 
 impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
@@ -121,7 +120,8 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 							.execute(&connection)
 							.expect("failed to connect to db or insert item");
 
-						users.filter(email.eq(&token.email))
+						users
+							.filter(email.eq(&token.email))
 							.first::<User>(&connection)
 							.unwrap_or_else(|_| unreachable!("uh oh, this shouldn't happen, is your DB okay?"))
 					});
