@@ -79,7 +79,9 @@ def post(data):
         setattr(result, key, value)
     result.approved = False
 
-    events = session.query(Booking).filter(Booking.begin_time <= result.end_time).\
+    if __name__ == '__main__':
+        events = session.query(Booking).filter(Booking.approved == True).\
+                                    filter(Booking.begin_time <= result.end_time).\
                                     filter(Booking.end_time <= result.begin_time)
     for event in events:
         if event.rooms == 3:
@@ -142,8 +144,25 @@ def delete(data):
     else:
         return json.dumps({"result": 1})  # no result found by the id
 
+def approve(data):
+    """
+    Deletes event by it's id
+    :param data: {id}
+    :return: {result: number}
+    """
 
-methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete}
+    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
+    if len(results) == 1:
+        result = results[0]
+        setattr(result, "approved", True)
+        session.add(result)
+        session.commit()
+        return json.dumps({"result": 0})
+    else:
+        return json.dumps({"result": 1})  # no result found by the id
+
+
+methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete, "approve" : approve}
 txt = sys.stdin.read()
 txt = re.sub(",[ \t\r\n]+}", "}", txt)
 txt = re.sub(",[ \t\r\n]+\]", "]", txt)
