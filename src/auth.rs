@@ -41,8 +41,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
 				//... pošéfit databázi zde
 
                                 let connection = SqliteConnection::establish(&env::var("DATABASE_URL")
-                                    .expect("DATABASE_URL not in env"))
-                                    .expect("error connection to db");
+                                    .expect("DATABASE_URL not in env")
+                                    ).expect("error connection to db");
                                 
 
 				Outcome::Success(token)
