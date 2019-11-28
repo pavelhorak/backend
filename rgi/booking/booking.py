@@ -146,9 +146,9 @@ def delete(data):
 
 def approve(data):
     """
-    Deletes event by it's id
+    Approvs event by it's id
     :param data: {id}
-    :return: {result: number}
+    :return: ?
     """
 
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
