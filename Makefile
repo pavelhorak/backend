@@ -5,7 +5,7 @@ dev: src/* frontend
 	cargo build
 
 docs: src/*
-	cargo doc --no-deps --target-dir docs
+	cargo doc --no-deps
 
 frontend: frontend/
 	cd frontend && make
