@@ -10,7 +10,6 @@ from google.auth.transport.requests import Request
 from googleapiclient import errors
 from googleapiclient.discovery import build
 
-
 def get_service():
     """Get an authorized Gmail API service instance.
 
@@ -46,8 +45,6 @@ def get_service():
     service = build('gmail', 'v1', credentials=creds)
     return service
 
-
-Service = get_service()
 
 def send_message(service, sender, message):
   """Send an email message.
