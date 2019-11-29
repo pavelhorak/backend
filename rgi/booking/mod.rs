@@ -16,7 +16,7 @@ use diesel::prelude::*;
 /// vrací všechny rezervace
 ///
 /// GET /events "application/json"
-#[get("/events", format = "application/json")]
+#[get("/events")]
 pub fn list() -> String {
 	rgi! {
 		LIST "rgi/booking/booking.py"
@@ -29,7 +29,7 @@ pub fn list() -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[get("/events/<id>", format = "application/json")]
+#[get("/events/<id>")]
 pub fn get(id: i32) -> Option<String> {
 	if id < 0 {
 		None?
