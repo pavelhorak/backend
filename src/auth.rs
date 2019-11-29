@@ -72,21 +72,21 @@ pub mod roles {
 	}
 
 	macro_rules! role_gen {
-		{$($role:ident $(-> $daddy:ident)?)*} => {
+		{$(($role:ident $(-> $daddy:ident)*))*} => {
 			$(
 				pub struct $role;
 				impl Role for $role {
 					fn name() -> &'static str { stringify!($role) }
-					$(fn daddy() -> Option<&'static str> { Some(stringify!($daddy)) })?
+					$(fn daddy() -> Option<&'static str> { Some(stringify!($daddy)) })*
 				}
 			)*
 		}
 	 }
 
 	role_gen! {
-	   Noob
-	   Approver        -> Noob
-	   FacilityManager -> Noob
+	   (Noob)
+	   (Approver -> Noob)
+	   (FacilityManager -> Noob)
 	}
 }
 
