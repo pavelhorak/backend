@@ -35,17 +35,15 @@ pub struct AuthTokenRaw {
 
 /// autorizační token po vyřešení údajů s databází
 #[derive(Serialize, Deserialize)]
-pub struct AuthToken<T: roles::Role> {
+pub struct AuthToken {
 	/// nalezený uživatel
 	pub user: User,
-	/// marker pro rezoluci role
-	pub _m: PhantomData<T>,
 }
 
-impl<T: roles::Role> AuthToken<T> {
+impl AuthToken {
 	/// sestrojí nový AuthToken z instace [`User`]
 	pub fn from_user(user: User) -> Self {
-		AuthToken { user, _m: PhantomData }
+		AuthToken { user }
 	}
 }
 
@@ -90,7 +88,7 @@ pub mod roles {
 	}
 }
 
-impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
+impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
 	type Error = String;
 
 	fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
@@ -145,18 +143,19 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 							.unwrap_or_else(|_| unreachable!("uh oh, this shouldn't happen, is your DB okay?"))
 					});
 
-				if T::name().to_lowercase() == result.role.to_lowercase() {
-					Outcome::Success(AuthToken::from_user(result))
-				} else if let Some(daddy) = T::daddy() {
-					println!("{}", daddy);
-					match daddy.to_lowercase() == result.role.to_lowercase() {
-						true => Outcome::Success(AuthToken::from_user(result)),
-						false => Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string())),
-					}
-				} else {
-					println!("yeetus that feetus?");
-					Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string()))
-				}
+				//if T::name().to_lowercase() == result.role.to_lowercase() {
+				//	Outcome::Success(AuthToken::from_user(result))
+				//} else if let Some(daddy) = T::daddy() {
+				//	println!("{}", daddy);
+				//	match daddy.to_lowercase() == result.role.to_lowercase() {
+				//		true =>
+				Outcome::Success(AuthToken::from_user(result))
+				//		false => Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string())),
+				//	}
+				//} else {
+				//	println!("yeetus that feetus?");
+				//	Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string()))
+				//}
 			}
 			x => {
 				println!("{:?}", x);
@@ -168,6 +167,6 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 
 /// vrací informace o uživatelu
 #[get("/me")]
-pub fn me(_u: AuthToken<self::roles::Approver>) -> Json<User> {
+pub fn me(_u: AuthToken) -> Json<User> {
 	 Json(_u.user)
 }
