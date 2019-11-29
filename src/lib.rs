@@ -51,7 +51,9 @@ extern crate diesel;
 extern crate dotenv;
 
 use dotenv::dotenv;
-use rocket_cors::{AllowedOrigins, AllowedHeaders};
+use rocket::http::Method;
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
+
 use std::str::FromStr;
 
 pub mod auth;
@@ -68,16 +70,18 @@ use db::DbConn;
 /// Vrací instanci Rocketu
 pub fn init() -> rocket::Rocket {
 	dotenv().ok();
-	let cors = rocket_cors::Cors {
-		allowed_origins: AllowedOrigins::all(),
-		allowed_methods: vec!["options", "delete", "patch", "trace", "post", "get", "put"]
-			.into_iter()
-			.map(|s| FromStr::from_str(s).unwrap_or_else(|_| unreachable!("HTTP methods must be correct")))
-			.collect(),
-		allowed_headers: AllowedHeaders::all(),
-		allow_credentials: true,
-		..Default::default()
-	};
+	let allowed_origins = AllowedOrigins::all();
+
+    // You can also deserialize this
+    let cors = rocket_cors::CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post, Method::Options, Method::Patch, Method::Delete, Method::Head]
+			.into_iter().map(From::from).collect(),
+        allowed_headers: AllowedHeaders::all(),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors().unwrap();
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])

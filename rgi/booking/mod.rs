@@ -30,7 +30,7 @@ pub fn list() -> String {
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[get("/events/<id>")]
-pub fn get(id: i32) -> Option<String> {
+pub fn get(id: i32, _u: AuthToken<Noob>) -> Option<String> {
 	if id < 0 {
 		None?
 	}
@@ -50,6 +50,7 @@ pub fn get(id: i32) -> Option<String> {
 pub fn post(_input: Json<NewReservation>, usr: AuthToken<Noob>) -> String {
 	let name = usr.user.name;
 	let user_id = usr.user.id;
+
 	rgi! {
 		POST "rgi/booking/booking.py"
 		arg: user_id,
@@ -131,7 +132,7 @@ pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
 /// - `begin_time`: počáteční čas
 /// - `end_time`: čas konce
 #[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
-pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
+pub fn date_filter(rooms: i32, begin_time: String, end_time: String, _u: AuthToken<Noob>) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
 		arg: rooms,
