@@ -120,10 +120,10 @@ pub fn delete(r_id: i32, usr: AuthToken) -> Option<String> {
 		let con = db::get_con();
 		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
 
-		if reservation.author.trim() != usr.user.email.trim() {
+		/*if reservation.author.trim() != usr.user.email.trim() {
 			println!("fuck");
 			None? // you shouldn't be able to delete others' either
-		}
+		}*/
 	}
 
 	let id = r_id;
