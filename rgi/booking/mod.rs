@@ -48,13 +48,14 @@ pub fn get(id: i32, _u: AuthToken) -> Option<String> {
 /// data: [`NewReservation`]
 #[post("/events", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>, usr: AuthToken) -> String {
-	let name = usr.user.name;
-	let user_id = usr.user.id;
-	let email = usr.user.email;
+	let name = usr.user.name.clone();
+	let user_id = usr.user.id.clone();
+	let email = usr.user.email.clone();
 
 	rgi! {
 		POST "rgi/booking/booking.py"
 		arg: user_id,
+		arg: email,
 		arg: name
 		data: (&_input.into_inner())
 	}
@@ -70,6 +71,10 @@ pub fn post(_input: Json<NewReservation>, usr: AuthToken) -> String {
 /// data:[`UpdateReservation`]
 #[patch("/events/<r_id>", data = "<_input>")]
 pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken) -> Option<String> {
+	let name = usr.user.name.clone();
+	let user_id = usr.user.id.clone();
+	let email = usr.user.email.clone();
+
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
 		None?
@@ -89,7 +94,10 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken) -> Opti
 	let id = r_id;
 	Some(rgi! {
 		PATCH "rgi/booking/booking.py"
-		arg: id
+		arg: id,
+		arg: user_id,
+		arg: name,
+		arg: email
 		data: (&_input.into_inner())
 	})
 }
