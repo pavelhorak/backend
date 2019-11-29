@@ -46,7 +46,7 @@ pub fn get(id: i32) -> Option<String> {
 /// POST /events application/json
 ///
 /// data: [`NewReservation`]
-#[post("/events", format = "application/json", data = "<_input>")]
+#[post("/events", data = "<_input>")]
 pub fn post(_input: Json<NewReservation>, usr: AuthToken<Noob>) -> String {
 	let name = usr.user.name;
 	let user_id = usr.user.id;
@@ -66,7 +66,7 @@ pub fn post(_input: Json<NewReservation>, usr: AuthToken<Noob>) -> String {
 /// - `id`: identifikátor dané rezervace
 ///
 /// data:[`UpdateReservation`]
-#[patch("/events/<r_id>", format = "application/json", data = "<_input>")]
+#[patch("/events/<r_id>", data = "<_input>")]
 pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -> Option<String> {
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -98,7 +98,7 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[delete("/events/<r_id>", format = "application/json")]
+#[delete("/events/<r_id>")]
 pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -124,7 +124,7 @@ pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
 }
 
 ///
-#[get("/events/filter/<rooms>/<begin_time>/<end_time>", format = "application/json")]
+#[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
 pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
@@ -135,7 +135,7 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 }
 
 ///
-#[post("/events/<id>/approve", format = "application/json")]
+#[post("/events/<id>/approve")]
 pub fn approve(id: i32, _u: AuthToken<Approver>) -> String {
 	rgi! {
 		APPROVE "rgi/booking/booking.py"
