@@ -47,8 +47,6 @@ def get_service():
     return service
 
 
-Service = get_service()
-
 def send_message(service, sender, message):
   """Send an email message.
 
