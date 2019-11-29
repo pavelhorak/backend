@@ -15,6 +15,7 @@ Base = automap_base()
 engine = create_engine("sqlite:///" + os.getenv("DATABASE_URL"))
 Base.prepare(engine, reflect=True)
 Booking = Base.classes.booking
+User = Base.classes.users
 session = Session(engine)
 
 approver = "xsicp01@gjk.cz"
@@ -49,6 +50,9 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
+        result = results[0]
+        user = session.query(Booking).filter(User.email == result.author).all()
+        setattr(result, "email", user[0].email)
         return json.dumps(results[0], cls=AlchemyEncoder)
     else:
         return json.dumps({"result": 1})
