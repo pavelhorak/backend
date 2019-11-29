@@ -50,11 +50,13 @@ pub fn get(id: i32, _u: AuthToken<Noob>) -> Option<String> {
 pub fn post(_input: Json<NewReservation>, usr: AuthToken<Noob>) -> String {
 	let name = usr.user.name;
 	let user_id = usr.user.id;
+	let email = usr.user.email;
 
 	rgi! {
 		POST "rgi/booking/booking.py"
 		arg: user_id,
-		arg: name
+		arg: name,
+		arg: email
 		data: (&_input.into_inner())
 	}
 }
