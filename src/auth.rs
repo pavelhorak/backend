@@ -98,6 +98,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 		let keys: Vec<_> = request.headers().get("Authorization").collect();
 		match keys.get(0).unwrap_or(&"").split(' ').nth(1) {
 			Some(ref token) => {
+				eprintln!("decoding");
 				let body = match decode(token) {
 					Ok(bod) => bod,
 					Err(_) =>
@@ -107,6 +108,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 						)),
 				};
 
+				eprintln!("parsing");
 				let token: AuthTokenRaw = match serde_json::from_str(&String::from_utf8_lossy(&body).to_string()) {
 					Ok(tok) => tok,
 					Err(e) =>
