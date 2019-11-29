@@ -72,21 +72,21 @@ pub mod roles {
 	}
 
 	macro_rules! role_gen {
-		{$(($role:ident $(-> $daddy:ident)*))*} => {
+		{$(($role:ident -> $daddy:expr))*} => {
 			$(
 				pub struct $role;
 				impl Role for $role {
 					fn name() -> &'static str { stringify!($role) }
-					$(fn daddy() -> Option<&'static str> { Some(stringify!($daddy)) })*
+					fn daddy() -> Option<&'static str> { $daddy }
 				}
 			)*
 		}
 	 }
 
 	role_gen! {
-	   (Noob)
-	   (Approver -> Noob)
-	   (FacilityManager -> Noob)
+	   (Noob -> None)
+	   (Approver -> Some("noob"))
+	   (FacilityManager -> Some("noob"))
 	}
 }
 
@@ -154,6 +154,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 						false => Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string())),
 					}
 				} else {
+					println!("yeetus that feetus?");
 					Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string()))
 				}
 			}
