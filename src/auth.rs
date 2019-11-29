@@ -42,6 +42,11 @@ impl<T: roles::Role> AuthToken<T> {
 /// obsahuje nulové typy pro role
 /// tento design umožňužje zneužít funkce Rustu pro deklarativní
 /// ověření -> pouze stačí do routy přidat parametr s typem `AuthToken<Approved>`.
+///
+/// současné role a jejich stringy (stringy jsou case-insensitive):
+/// -  [`roles::Noob`] -> `noob`
+/// -  [`roles::Approver`] -> `approver`
+/// -  [`roles::FacilityManager`] -> `facilitymanager`
 pub mod roles {
 	#![allow(dead_code, missing_docs)]
 
