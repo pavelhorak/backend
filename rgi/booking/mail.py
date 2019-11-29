@@ -88,7 +88,7 @@ def create_message(sender, to, subject, message_text):
     b = base64.urlsafe_b64encode(s.encode('utf-8'))
     return {'raw': b.decode('utf-8')}
 
-def send_user_approval(sender, to, auditorium, time_start, time_end):
+def send_approval(sender, to, auditorium, time_start, time_end):
 
     """
     Pošle email o schválení rezervace na základě zadaných parametrů
@@ -118,7 +118,7 @@ def send_user_approval(sender, to, auditorium, time_start, time_end):
     send_message(service, sender, message)
 
 
-def send_user_denial(sender, to, auditorium, time_start, time_end):
+def send_denial(sender, to, auditorium, time_start, time_end):
     """
     Pošle email o zamítnutí rezervace na základě zadaných parametrů
     :param sender: adresa odesílatele
