@@ -88,7 +88,7 @@ pub fn init() -> rocket::Rocket {
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
-		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon,])
+		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon, auth::me])
 		.mount("/rgi/", rgi::routes())
 		.attach(cors)
 		.attach(DbConn::fairing())
