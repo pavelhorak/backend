@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-#from mail import send_request, send_approval, send_denial
+from rgi.booking.mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
@@ -16,6 +16,8 @@ engine = create_engine("sqlite:///" + os.getenv("DATABASE_URL"))
 Base.prepare(engine, reflect=True)
 Booking = Base.classes.booking
 session = Session(engine)
+
+approver = "xsicp01@gjk.cz"
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -158,6 +160,8 @@ def approve(data):
                 return json.dumps({"result": 2})
             elif event.rooms == result.rooms:
                 return json.dumps({"result": 2})
+
+        send_approval("xsicp01@gjk.cz", "xsicp01@gjk.cz", result.rooms, result.begin_time, result.end_time)
         result.approved = 1
         session.add(result)
         session.commit()
