@@ -148,6 +148,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 				if T::name().to_lowercase() == result.role.to_lowercase() {
 					Outcome::Success(AuthToken::from_user(result))
 				} else if let Some(daddy) = T::daddy() {
+					println!("{}", daddy);
 					match daddy.to_lowercase() == result.role.to_lowercase() {
 						true => Outcome::Success(AuthToken::from_user(result)),
 						false => Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string())),
