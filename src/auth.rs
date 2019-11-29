@@ -1,4 +1,13 @@
 //! modul s autentifikačními funkcemi
+//!
+//! ## přidání autorizace k endpointu
+//! stačí přidat AuthToken parametr s typem
+//! ```no_run
+//! #[get("/supersecretstuff")]
+//! pub fn example(_u: AuthToken<roles::FacilityManager>) {
+//!
+//! }
+//!```
 
 use serde::{Deserialize, Serialize};
 
@@ -119,7 +128,11 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 					.unwrap_or_else(|| {
 						// unfortunately, SQLite does not support the RETURNING clause, so one has to do this atrocity
 						diesel::insert_into(users)
-							.values(NewUser { name: token.name.clone(), email: token.email.clone() })
+							.values(NewUser {
+								name:  token.name.clone(),
+								email: token.email.clone(),
+								role:  "noob".to_string(),
+							})
 							.execute(&connection)
 							.expect("failed to connect to db or insert item");
 

@@ -129,4 +129,6 @@ pub struct NewUser {
 	pub name: String,
 	/// email
 	pub email: String,
+	/// role
+	pub role: String,
 }
