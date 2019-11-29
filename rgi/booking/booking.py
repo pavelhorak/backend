@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-#from rgi.booking.mail import send_request, send_approval, send_denial
+from mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
