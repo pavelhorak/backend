@@ -168,6 +168,6 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 
 /// vrací informace o uživatelu
 #[get("/me")]
-pub fn me(_u: AuthToken<self::roles::Noob>) -> Json<User> {
+pub fn me(_u: AuthToken<self::roles::Approver>) -> Json<User> {
 	 Json(_u.user)
 }
