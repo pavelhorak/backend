@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from mail import send_request, send_approval, send_denial
+#from rgi.booking.mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
@@ -15,6 +15,7 @@ Base = automap_base()
 engine = create_engine("sqlite:///" + os.getenv("DATABASE_URL"))
 Base.prepare(engine, reflect=True)
 Booking = Base.classes.booking
+User = Base.classes.users
 session = Session(engine)
 
 approver = "xsicp01@gjk.cz"
@@ -49,6 +50,9 @@ def get(data):
     """
     results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
     if len(results) == 1:
+        result = results[0]
+        user = session.query(Booking).filter(User.email == result.author).all()
+        setattr(result, "email", user[0].email)
         return json.dumps(results[0], cls=AlchemyEncoder)
     else:
         return json.dumps({"result": 1})
@@ -76,7 +80,8 @@ def post(data):
         if value is None:
             continue
         setattr(result, key, value)
-    result.approved = False
+    setattr(result, "approved", False)
+    setattr(result, "author", data["args"]["email"])
 
     events = session.query(Booking).filter(Booking.approved == 1).\
                                     filter(Booking.begin_time <= result.end_time).\
@@ -161,7 +166,7 @@ def approve(data):
             elif event.rooms == result.rooms:
                 return json.dumps({"result": 2})
 
-        send_approval("xsicp01@gjk.cz", "xsicp01@gjk.cz", result.rooms, result.begin_time, result.end_time)
+        #send_approval("xsicp01@gjk.cz", "xsicp01@gjk.cz", result.rooms, result.begin_time, result.end_time)
         result.approved = 1
         session.add(result)
         session.commit()
