@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from mail import send_request, send_approval, send_denial
+from rgi.booking.mail import send_request, send_approval, send_denial
 import sys
 import json
 import os
@@ -76,7 +76,8 @@ def post(data):
         if value is None:
             continue
         setattr(result, key, value)
-    result.approved = False
+    setattr(result, "approved", False)
+    setattr(result, "author", data["args"]["email"])
 
     events = session.query(Booking).filter(Booking.approved == 1).\
                                     filter(Booking.begin_time <= result.end_time).\
