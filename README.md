@@ -27,7 +27,6 @@ docker run -p <yourport>:8000 -d cw
 + yarn
 + google-api-python-client
 + google_auth_oauthlib
-+ apiclient
 
 #### Building
 ```shell
