@@ -52,8 +52,8 @@ def get(data):
     if len(results) == 1:
         result = results[0]
         user = session.query(Booking).filter(User.email == result.author).all()
-        setattr(result, "email", user[0].email)
-        return json.dumps(results[0], cls=AlchemyEncoder)
+        setattr(result, "author_name", user[0].name)
+        return json.dumps(result, cls=AlchemyEncoder)
     else:
         return json.dumps({"result": 1})
 
