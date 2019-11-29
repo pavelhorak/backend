@@ -94,8 +94,7 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 
 /// vymaže danou rezervaci
 ///
-/// DELETE /events/<id> application/json
-///
+/// DEL///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
@@ -123,7 +122,14 @@ pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
 	})
 }
 
+/// filtruje podle data
 ///
+/// GET /events/filter/<rooms>/<begin_time>/end_time>
+///
+/// parametry:
+/// - `rooms`:  bitflagy pro místnosti, viz [`Reservation`]
+/// - `begin_time`: počáteční čas
+/// - `end_time`: čas konce
 #[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
 pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	rgi! {
@@ -134,7 +140,12 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String) -> String {
 	}
 }
 
+/// schválí endpoint
 ///
+/// POST /events/<id>/approve
+///
+/// parametry:
+/// - `id`: id rezervace
 #[post("/events/<id>/approve")]
 pub fn approve(id: i32, _u: AuthToken<Approver>) -> String {
 	rgi! {
