@@ -77,7 +77,7 @@ pub mod roles {
 				pub struct $role;
 				impl Role for $role {
 					fn name() -> &'static str { stringify!($role) }
-					$(fn daddy() -> &'static str { Some(stringify!($daddy)) })?
+					$(fn daddy() -> Option<&'static str> { Some(stringify!($daddy)) })?
 				}
 			)*
 		}
@@ -85,8 +85,8 @@ pub mod roles {
 
 	role_gen! {
 	   Noob
-	   Approver
-	   FacilityManager
+	   Approver        -> Noob
+	   FacilityManager -> Noob
 	}
 }
 
