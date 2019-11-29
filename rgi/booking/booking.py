@@ -53,7 +53,7 @@ def get(data):
         result = results[0]
         user = session.query(Booking).filter(User.email == result.author).all()
         setattr(result, "author_name", user[0].name)
-        return json.dumps(results[0], cls=AlchemyEncoder)
+        return json.dumps(result, cls=AlchemyEncoder)
     else:
         return json.dumps({"result": 1})
 
