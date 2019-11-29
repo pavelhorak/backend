@@ -1,6 +1,43 @@
 # backend
 Backend
 
+## Building
+
+### Docker
+
+#### Building
+```shell
+docker build -t cw .
+```
+#### Running
+```shell
+docker run -p <yourport>:8000 -d cw
+```
+
+### Without docker
+
+#### Dependencies
++ nightly rust (rustup and `rustup install nightly`)
++ make
++ gcc
++ pkgconf
++ sqlite
++ python
++ python-sqlalchemy
++ yarn
++ google-api-python-client
++ google_auth_oauthlib
++ apiclient
+
+#### Building
+```shell
+make
+```
+#### Running
+```shell
+cargo run --release
+```
+
 ## /rgi/events/<id>
 Vrací JSON s následující strukturou
 - id
