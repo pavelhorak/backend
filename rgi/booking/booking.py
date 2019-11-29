@@ -98,7 +98,7 @@ def filter(data):
     """
 
     reservations = session.query(Booking).filter(Booking.begin_time <= data["args"]["end_time"]).\
-                                          filter(Booking.end_time <= data["args"]["begin_time"])
+                                          filter(Booking.end_time >= data["args"]["begin_time"])
     if data["args"]["rooms"] != 3:
         reservations.filter(Booking.rooms == data["args"]["rooms"])
 
