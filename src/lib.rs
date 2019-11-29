@@ -72,16 +72,19 @@ pub fn init() -> rocket::Rocket {
 	dotenv().ok();
 	let allowed_origins = AllowedOrigins::all();
 
-    // You can also deserialize this
-    let cors = rocket_cors::CorsOptions {
-        allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post, Method::Options, Method::Patch, Method::Delete, Method::Head]
-			.into_iter().map(From::from).collect(),
-        allowed_headers: AllowedHeaders::all(),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors().unwrap();
+	// You can also deserialize this
+	let cors = rocket_cors::CorsOptions {
+		allowed_origins,
+		allowed_methods: vec![Method::Get, Method::Post, Method::Options, Method::Patch, Method::Delete, Method::Head]
+			.into_iter()
+			.map(From::from)
+			.collect(),
+		allowed_headers: AllowedHeaders::all(),
+		allow_credentials: true,
+		..Default::default()
+	}
+	.to_cors()
+	.unwrap();
 
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
