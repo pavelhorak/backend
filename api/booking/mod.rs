@@ -53,37 +53,23 @@ pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Op
 pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
 	if db.read()
 		.iter()
-		.filter(|(_, x)| x.approved == true)
-			// todo time-checking
-			//&& (x.rooms == 3 || x.rooms == input.rooms))
-		.count() != 0
+		.filter(|(_, x)|
+			x.approved == true
+			&& x.begin_time <= input.end_time
+			&& x.end_time >= input.begin_time
+			&& (x.rooms == 3 || x.rooms == input.rooms)
+		)
+		.any()
 	{
-		None?
+		return None; // todo proper errors
 	}
 
-	//db.write()
-	//	.insert
+	let mut new_res = input.into_inner().into();
 
-	/*use crate::schema::booking::dsl::*;
+	new_res.author = usr.email;
 
-	if booking
-		.filter(approved.eq(true))
-		.filter(begin_time.le(input.end_time))
-		.filter(end_time.ge(input.begin_time))
-		.filter(rooms.eq(3).or(rooms.eq(input.rooms)))
-		.select(id)
-		.first::<i32>((&*conn) as &diesel::SqliteConnection)
-		.optional()
-		.is_some()
-	{
-		None? // TODO return propper error
-	}
-
-	diesel::insert_into(booking)
-		.values(input.into_inner())
-		.execute((&*conn) as &diesel::SqliteConnection)
-		.ok()?*/
-	unimplemented!()
+	db.write()
+		.insert(Database::get_key().unwrap(), new_res)
 }
 
 /// upraví danou rezervaci

@@ -87,6 +87,11 @@ impl<T: Table> Database<T> {
 	pub fn read(&self) -> &TreeMan<T::Key, T::Value> { &self.0 }
 	/// read and write access to tree
 	pub fn write(&mut self) -> &mut TreeMan<T::Key, T::Value> { &mut self.0 }
+	/// procures a new random u64 key
+	pub fn get_key() -> sled::Result<u64> {
+		let lock = DB.read();
+		lock.generate_id()
+	}
 }
 
 /// trait for the Table marker types

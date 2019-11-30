@@ -2,12 +2,13 @@
 
 use serde::{Serialize, Deserialize};
 use crate::auth::AuthToken;
+use chrono::{DateTime, offset::Utc};
+
+use std::convert::From;
 
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reservation {
-	/// primární klíč
-	pub id: u64,
 	/// název události
 	pub name: String,
 	/// popis události
@@ -25,9 +26,9 @@ pub struct Reservation {
 	/// ```
 	pub rooms: u8,
 	/// počáteční čas rezervace
-	pub begin_time: String,
+	pub begin_time: DateTime<Utc>,
 	/// čas, kdy rezervace končí
-	pub end_time: String,
+	pub end_time: DateTime<Utc>,
 	/// rozložení nábytku v audioriu
 	pub layout: u8,
 	/// zda byla rezervace schválena
@@ -55,14 +56,31 @@ pub struct NewReservation {
 	/// ```
 	pub rooms: u8,
 	/// počáteční čas rezervace
-	pub begin_time: String,
+	pub begin_time: DateTime<Utc>,
 	/// čas, kdy rezervace končí
-	pub end_time: String,
+	pub end_time: DateTime<Utc>,
 	/// rozložení nábytku v audioriu
 	pub layout: u8,
 	/// počet lidí
 	pub people: u8,
 }
+
+impl From<NewReservation> for Reservation {
+	pub fn from(src: NewReservation) -> Reservation {
+		Reservation {
+			name: src.name,
+			description: src.description,
+			author: String::new(),
+			rooms: src.rooms,
+			begin_time: src.begin_time,
+			end_time: src.end_time,
+			layout: src.layout,
+			approved: false,
+			people: src.people,
+		}
+	}
+}
+
 
 /// Weird quick models
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -83,9 +101,9 @@ pub struct UpdateReservation {
 	/// ```
 	pub rooms: Option<u8>,
 	/// počáteční čas rezervace
-	pub begin_time: Option<String>,
+	pub begin_time: Option<DateTime<Utc>>,
 	/// čas, kdy rezervace končí
-	pub end_time: Option<String>,
+	pub end_time: Option<DateTime<Utc>>,
 	/// rozložení nábytku v audioriu
 	pub layout: Option<u8>,
 	/// počet lidí
