@@ -40,6 +40,7 @@
 //!     └── static_server.rs - statický server
 //! ```
 #![feature(proc_macro_hygiene, decl_macro)]
+#![feature(associated_type_defaults)]
 #![allow(clippy::match_bool)]
 #![deny(missing_docs)]
 
@@ -47,25 +48,25 @@
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
+
 #[macro_use]
-extern crate diesel;
+extern crate lazy_static;
+
+extern crate serde_cbor;
 extern crate dotenv;
+extern crate serde;
+extern crate sled;
 
 use dotenv::dotenv;
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
+pub mod static_server;
 pub mod auth;
 pub mod api;
+
 pub mod db;
-pub mod static_server;
-
-/// schéma databáze (vygenerováno Dieselem)
-#[allow(missing_docs)]
-pub mod schema;
-
-use db::DbConn;
-
+pub mod models;
 /// Vrací instanci Rocketu
 pub fn init() -> rocket::Rocket {
 	dotenv().ok();
@@ -90,5 +91,4 @@ pub fn init() -> rocket::Rocket {
 		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon, auth::me])
 		.mount("/api/", api::routes())
 		.attach(cors)
-		.attach(DbConn::fairing())
 }

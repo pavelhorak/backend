@@ -17,12 +17,10 @@ use rocket::http::Status;
 
 use base64::decode;
 
-use diesel::prelude::*;
-
 use std::marker::PhantomData;
 
 use crate::db;
-use crate::db::{NewUser, User};
+use crate::models::{NewUser, User};
 
 /// autorizační token, tak jak je přijat
 #[derive(Serialize, Deserialize)]
@@ -94,7 +92,7 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 	type Error = String;
 
 	fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
-		use crate::schema::users::dsl::*;
+		/*use crate::schema::users::dsl::*;
 
 		let keys: Vec<_> = request.headers().get("Authorization").collect();
 		match keys.get(0).unwrap_or(&"").split(' ').nth(1) {
@@ -162,7 +160,8 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 				println!("{:?}", x);
 				Outcome::Failure((Status::BadRequest, "invalid authorization header".to_string()))
 			}
-		}
+		}*/
+		unimplemented!()
 	}
 }
 

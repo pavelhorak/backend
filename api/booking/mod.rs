@@ -1,13 +1,19 @@
 use rocket::Route;
 use rocket_contrib::json::Json;
 
+use serde_cbor;
+
 use crate::auth::AuthToken;
 use crate::auth::roles::{Noob, Approver, Role};
 
-use crate::db;
-use crate::db::{NewReservation, UpdateReservation, Reservation, DbConn};
 
-use diesel::prelude::*;
+use crate::db::{
+	Database,
+	table::Reservations,
+	table::Users,
+};
+
+use crate::models::{NewReservation, UpdateReservation, Reservation};
 
 /*
 ** TODO proper type for response, handle RGI responses
@@ -17,13 +23,16 @@ use diesel::prelude::*;
 ///
 /// GET /events "application/json"
 #[get("/events", format = "application/json")]
-pub fn list(conn: DbConn) -> Option<Json<Vec<Reservation>>> {
-	use crate::schema::booking::dsl::*;
-	 
-	booking
-		.load::<Reservation>((&*conn) as &diesel::SqliteConnection)
-		.ok()
-		.map(Json)
+pub fn list(db: Database<Reservations>) -> Json<Vec<(u64, Reservation)>> {
+	Json(
+		db.read().iter()
+			.filter_map(|r| r.ok())
+			.map(|(k, v)| (serde_cbor::from_slice(&k), (serde_cbor::from_slice(&v))))
+			// omit invalid data
+			.filter(|(a, b)| a.is_ok() && b.is_ok())
+			.map(|(a, b)| (a.unwrap(), b.unwrap()))
+			.collect::<Vec<(u64, Reservation)>>()
+	)
 }
 
 /// vrátí JSON dané rezervace
@@ -33,15 +42,11 @@ pub fn list(conn: DbConn) -> Option<Json<Vec<Reservation>>> {
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[get("/events/<event_id>")]
-pub fn get(event_id: i32, conn: DbConn, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
-	use crate::schema::booking::dsl::*;
-
-	booking
-		.find(event_id)
-		.first::<Reservation>((&*conn) as &diesel::SqliteConnection)
-		.optional()
-		.ok()
-		.flatten()
+pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
+	db.read()
+		.get(serde_cbor::to_vec(&event_id).unwrap()) // can't fail
+		.ok()?
+		.map(|x| serde_cbor::from_slice(&x).ok())?
 		.map(Json)
 }
 
@@ -51,8 +56,8 @@ pub fn get(event_id: i32, conn: DbConn, _u: AuthToken<Noob>) -> Option<Json<Rese
 ///
 /// data: [`NewReservation`]
 #[post("/events", data = "<input>")]
-pub fn post(input: Json<NewReservation>, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
-	use crate::schema::booking::dsl::*;
+pub fn post(input: Json<NewReservation>, usr: AuthToken<Noob>) -> Option<()> {
+	/*use crate::schema::booking::dsl::*;
 
 	if booking
 		.filter(approved.eq(true))
@@ -70,7 +75,8 @@ pub fn post(input: Json<NewReservation>, conn: DbConn, usr: AuthToken<Noob>) -> 
 	diesel::insert_into(booking)
 		.values(input.into_inner())
 		.execute((&*conn) as &diesel::SqliteConnection)
-		.ok()?
+		.ok()?*/
+	unimplemented!()
 }
 
 /// upraví danou rezervaci
@@ -83,6 +89,7 @@ pub fn post(input: Json<NewReservation>, conn: DbConn, usr: AuthToken<Noob>) -> 
 /// data:[`UpdateReservation`]
 #[patch("/events/<r_id>", data = "<_input>")]
 pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -> Option<String> {
+/*
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
 		None?
@@ -105,6 +112,8 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 		arg: id
 		data: (&_input.into_inner())
 	})
+*/
+	unimplemented!()
 }
 
 /// vymaže danou rezervaci
@@ -113,8 +122,8 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
-pub fn delete(r_id: i32, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
-	use crate::schema::booking::dsl::*;
+pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<()> {
+/*	use crate::schema::booking::dsl::*;
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
 		None?
@@ -126,7 +135,7 @@ pub fn delete(r_id: i32, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
 		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
 
 		if reservation.author.trim() != usr.user.email.trim() {
-			None? // you shouldn't be able to delete others' either
+		None? // you shouldn't be able to delete others' either
 		}
 	}
 
@@ -136,6 +145,8 @@ pub fn delete(r_id: i32, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
 		.execute(&conn)
 		.ok()
 		.map(|_| ())
+*/
+	unimplemented!()
 }
 
 /// filtruje podle data
