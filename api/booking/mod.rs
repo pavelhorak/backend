@@ -50,19 +50,27 @@ pub fn get(event_id: i32, conn: DbConn, _u: AuthToken<Noob>) -> Option<Json<Rese
 /// POST /events application/json
 ///
 /// data: [`NewReservation`]
-#[post("/events", data = "<_input>")]
-pub fn post(_input: Json<NewReservation>, usr: AuthToken<Noob>) -> String {
-	let name = usr.user.name;
-	let user_id = usr.user.id;
-	let email = usr.user.email;
+#[post("/events", data = "<input>")]
+pub fn post(input: Json<NewReservation>, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
+	use crate::schema::booking::dsl::*;
 
-	rgi! {
-		POST "rgi/booking/booking.py"
-		arg: user_id,
-		arg: name,
-		arg: email
-		data: (&_input.into_inner())
+	if booking
+		.filter(approved.eq(true))
+		.filter(begin_time.le(input.end_time))
+		.filter(end_time.ge(input.begin_time))
+		.filter(rooms.eq(3).or(rooms.eq(input.rooms)))
+		.select(id)
+		.first::<i32>((&*conn) as &diesel::SqliteConnection)
+		.optional()
+		.is_some()
+	{
+		None? // TODO return propper error
 	}
+
+	diesel::insert_into(booking)
+		.values(input.into_inner())
+		.execute((&*conn) as &diesel::SqliteConnection)
+		.ok()?
 }
 
 /// upraví danou rezervaci
@@ -163,6 +171,6 @@ pub fn approve(id: i32, _u: AuthToken<Approver>) -> String {
 }
 
 /// vrací seznam endpointů pro nabindování do Rocketu
-pub fn routes()conn: DbConn,  -> Vec<Route> {
+pub fn routes() -> Vec<Route> {
 	routes![date_filter, list, approve, get, post, patch, delete,]
 }

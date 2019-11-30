@@ -20,7 +20,6 @@ session = Session(engine)
 
 approver = "xsicp01@gjk.cz"
 
-
 class AlchemyEncoder(json.JSONEncoder):
 
     def default(self, obj):
