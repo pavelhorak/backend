@@ -1,7 +1,7 @@
 //! contains database models and helper structs
 
 use serde::{Serialize, Deserialize};
-use auth::AuthToken;
+use crate::auth::AuthToken;
 
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Debug, Clone, Serialize, Deserialize)]

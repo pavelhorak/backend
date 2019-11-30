@@ -53,7 +53,7 @@ pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Op
 pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
 	if db.read()
 		.iter()
-		.filter(|(_, x)| x.approved == 1)
+		.filter(|(_, x)| x.approved == true)
 			// todo time-checking
 			//&& (x.rooms == 3 || x.rooms == input.rooms))
 		.count() != 0
