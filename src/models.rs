@@ -1,7 +1,6 @@
 //! contains database models and helper structs
 
 use serde::{Serialize, Deserialize};
-use crate::auth::AuthToken;
 use chrono::{DateTime, offset::Utc};
 
 use std::convert::From;
@@ -34,7 +33,7 @@ pub struct Reservation {
 	/// zda byla rezervace schválena
 	pub approved: bool,
 	/// počet lidí
-	pub people: i8,
+	pub people: u16,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -62,11 +61,11 @@ pub struct NewReservation {
 	/// rozložení nábytku v audioriu
 	pub layout: u8,
 	/// počet lidí
-	pub people: u8,
+	pub people: u16,
 }
 
 impl From<NewReservation> for Reservation {
-	pub fn from(src: NewReservation) -> Reservation {
+	fn from(src: NewReservation) -> Reservation {
 		Reservation {
 			name: src.name,
 			description: src.description,
@@ -99,7 +98,7 @@ pub struct UpdateReservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms: Option<u8>,
+	pub rooms: Option<u16>,
 	/// počáteční čas rezervace
 	pub begin_time: Option<DateTime<Utc>>,
 	/// čas, kdy rezervace končí
@@ -107,21 +106,19 @@ pub struct UpdateReservation {
 	/// rozložení nábytku v audioriu
 	pub layout: Option<u8>,
 	/// počet lidí
-	pub people: Option<u8>,
+	pub people: Option<u16>,
 }
 
 /// Model usera
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(dead_code)]
 pub struct User {
-	/// identifikátor
-	pub id: u64,
 	/// jméno uživatele
 	pub name: String,
 	/// email
 	pub email: String,
 	/// role
-	pub role: AuthToken,
+	pub role: String,
 }
 
 /// Model usera pro vložení do databáze
@@ -132,6 +129,4 @@ pub struct NewUser {
 	pub name: String,
 	/// email
 	pub email: String,
-	/// role
-	pub role: AuthToken,
 }

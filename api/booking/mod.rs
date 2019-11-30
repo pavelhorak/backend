@@ -1,9 +1,6 @@
 use rocket::Route;
 use rocket_contrib::json::Json;
 
-use serde_cbor;
-use chrono::DateTime;
-
 use crate::auth::AuthToken;
 use crate::auth::roles::{Noob, Approver, Role};
 
@@ -26,7 +23,8 @@ use crate::models::{NewReservation, UpdateReservation, Reservation};
 #[get("/events", format = "application/json")]
 pub fn list(db: Database<Reservations>) -> Json<Vec<(u64, Reservation)>> {
 	Json(
-		db.read().iter()
+		db.read()
+			.iter()
 			.collect::<Vec<(u64, Reservation)>>()
 	)
 }
@@ -50,26 +48,27 @@ pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Op
 ///
 /// data: [`NewReservation`]
 #[post("/events", data = "<input>")]
-pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+pub fn post(input: Json<NewReservation>, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
 	if db.read()
 		.iter()
-		.filter(|(_, x)|
+		.any(|(_, x)|
 			x.approved == true
 			&& x.begin_time <= input.end_time
 			&& x.end_time >= input.begin_time
 			&& (x.rooms == 3 || x.rooms == input.rooms)
 		)
-		.any()
 	{
 		return None; // todo proper errors
 	}
 
-	let mut new_res = input.into_inner().into();
+	let mut new_res: Reservation = input.into_inner().into();
 
-	new_res.author = usr.email;
+	new_res.author = usr.user.email;
 
 	db.write()
-		.insert(Database::get_key().unwrap(), new_res)
+		.insert(Database::<Reservations>::get_key().unwrap(), new_res)
+		.ok()?
+		.and_then(|_| Some(()))
 }
 
 /// upraví danou rezervaci
@@ -81,7 +80,8 @@ pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthTo
 ///
 /// data:[`UpdateReservation`]
 #[patch("/events/<r_id>", data = "<_input>")]
-pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -> Option<String> {
+pub fn patch(r_id: u64, _input: Json<UpdateReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<String> {
+
 /*
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -115,7 +115,8 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
-pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<()> {
+pub fn delete(r_id: u64, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+
 /*	use crate::schema::booking::dsl::*;
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -151,7 +152,7 @@ pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<()> {
 /// - `begin_time`: počáteční čas
 /// - `end_time`: čas konce
 #[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
-pub fn date_filter(rooms: i32, begin_time: String, end_time: String, _u: AuthToken<Noob>) -> String {
+pub fn date_filter(rooms: u8, begin_time: String, end_time: String, db: Database<Reservations>, _u: AuthToken<Noob>) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
 		arg: rooms,
@@ -167,7 +168,7 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String, _u: AuthTok
 /// parametry:
 /// - `id`: id rezervace
 #[post("/events/<id>/approve")]
-pub fn approve(id: i32, _u: AuthToken<Approver>) -> String {
+pub fn approve(id: u64, db: Database<Reservations>, _u: AuthToken<Approver>) -> String {
 	rgi! {
 		APPROVE "rgi/booking/booking.py"
 		arg: id

@@ -12,7 +12,6 @@ use std::env;
 use std::sync::RwLock;
 use std::borrow::Borrow;
 use std::iter::Iterator;
-use std::iter::FilterMap;
 use std::marker::PhantomData;
 
 
@@ -85,12 +84,29 @@ pub struct Database<T: Table>(TreeMan<T::Key, T::Value>, PhantomData<T>);
 impl<T: Table> Database<T> {
 	/// read-only access to tree
 	pub fn read(&self) -> &TreeMan<T::Key, T::Value> { &self.0 }
+
 	/// read and write access to tree
 	pub fn write(&mut self) -> &mut TreeMan<T::Key, T::Value> { &mut self.0 }
+
 	/// procures a new random u64 key
 	pub fn get_key() -> sled::Result<u64> {
-		let lock = DB.read();
+		let ref lock = DB.read().expect("the rwlock has been poisoned");
 		lock.generate_id()
+	}
+
+	/// opens the databasse
+	pub fn open() -> Option<Self> {
+		if T::has_get_tree() {
+			match T::get_tree() {
+				Ok(t) => Some(Database(TreeMan::from_tree(t), PhantomData)),
+				Err(_) => None,
+			}
+		} else {
+			match T::get_tree_naive() {
+				Ok(t) => Some(Database(TreeMan::from_tree(t), PhantomData)),
+				Err(_) => None,
+			}
+		}
 	}
 }
 
@@ -149,19 +165,18 @@ pub mod table {
 }
 
 impl<'a, 'r, T: Table> FromRequest<'a, 'r> for Database<T> {
-	type Error = String;
+	type Error = &'static str;
 
 	fn from_request(_: &'a Request<'r>) -> Outcome<Self, Self::Error> {
-		if T::has_get_tree() {
-			match T::get_tree() {
-				Ok(t) => Outcome::Success(Database(TreeMan::from_tree(t), PhantomData)),
-				Err(_) => Outcome::Failure((Status::InternalServerError, "failed to run custom database function and acquire tree".to_string())),
-			}
+		if let Some(db) = Database::<T>::open() {
+			Outcome::Success(db)
 		} else {
-			match T::get_tree_naive() {
-				Ok(t) => Outcome::Success(Database(TreeMan::from_tree(t), PhantomData)),
-				Err(_) => Outcome::Failure((Status::InternalServerError, "failed to acquire tree".to_string())),
-			}
+			Outcome::Failure((Status::InternalServerError,
+				match T::has_get_tree() {
+					true => "failed to run custom db-loading function",
+					false => "failed to load database",
+				}
+			))
 		}
 	}
 }
