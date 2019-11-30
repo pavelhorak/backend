@@ -16,11 +16,16 @@ use diesel::prelude::*;
 /// vrací všechny rezervace
 ///
 /// GET /events "application/json"
-#[get("/events")]
-pub fn list() -> String {
-	rgi! {
-		LIST "rgi/booking/booking.py"
-	}
+#[get("/events", format = "application/json")]
+pub fn list() -> Option<Json<Vec<Reservation>>> {
+	use crate::schema::booking::dsl::*;
+
+	let conn = db::get_con();
+	 
+	booking
+		.load::<Reservation>(&conn)
+		.ok()
+		.map(Json)
 }
 
 /// vrátí JSON dané rezervace
@@ -29,16 +34,19 @@ pub fn list() -> String {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[get("/events/<id>")]
-pub fn get(id: i32, _u: AuthToken<Noob>) -> Option<String> {
-	if id < 0 {
-		None?
-	}
+#[get("/events/<event_id>")]
+pub fn get(event_id: i32, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
+	use crate::schema::booking::dsl::*;
 
-	Some(rgi! {
-		GET "rgi/booking/booking.py"
-		arg: id
-	})
+	let conn = db::get_con();
+
+	booking
+		.find(event_id)
+		.first::<Reservation>(&conn)
+		.optional()
+		.ok()
+		.flatten()
+		.map(Json)
 }
 
 /// vrátí JSON dané rezervace

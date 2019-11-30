@@ -40,6 +40,7 @@
 //!     └── static_server.rs - statický server
 //! ```
 #![feature(proc_macro_hygiene, decl_macro)]
+#![allow(clippy::match_bool)]
 #![deny(missing_docs)]
 
 #[macro_use]
@@ -52,9 +53,7 @@ extern crate dotenv;
 
 use dotenv::dotenv;
 use rocket::http::Method;
-use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
-
-use std::str::FromStr;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 pub mod auth;
 pub mod rgi;
