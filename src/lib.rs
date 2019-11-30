@@ -56,7 +56,7 @@ use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 pub mod auth;
-pub mod rgi;
+pub mod api;
 pub mod db;
 pub mod static_server;
 
@@ -88,7 +88,7 @@ pub fn init() -> rocket::Rocket {
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
 		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon, auth::me])
-		.mount("/rgi/", rgi::routes())
+		.mount("/api/", api::routes())
 		.attach(cors)
 		.attach(DbConn::fairing())
 }
