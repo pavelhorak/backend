@@ -72,6 +72,24 @@ where
 		self.tree
 			.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap()) // can't fail
 	}
+
+	/// update a key
+	pub fn update<Key, Value, F>(&mut self, k: Key, fun: F) -> sled::Result<Option<sled::IVec>>
+	where
+		Key: Borrow<K>,
+		Value: Borrow<V>,
+		F: Fn(Option<V>) -> Option<V>,
+	{
+		self.tree
+			.update_and_fetch(
+				serde_cbor::to_vec(k.borrow()).unwrap(),
+				|value| {
+					let value = value.and_then(|val| serde_cbor::from_slice(val.borrow()).ok());
+					let res = fun(value);
+					res.and_then(|v| serde_cbor::to_vec(v.borrow()).ok())
+				}
+			)
+	}
 }
 
 /// wraps the database
