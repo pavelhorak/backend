@@ -14,7 +14,7 @@ use crate::db::{
 	table::Users,
 };
 
-use crate::models::{NewReservation, UpdateReservation, Reservation};
+use crate::models::{NewReservation, UpdateReservation, Reservation, ID, TEXT, NUMBER};
 
 /*
 ** TODO proper type for response, handle RGI responses
@@ -95,7 +95,7 @@ pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthTo
 ///
 /// data:[`UpdateReservation`]
 #[patch("/events/<r_id>", data = "<_input>")]
-pub fn patch(r_id: i32, _input: Json<UpdateReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<String> {
+pub fn patch(r_id: u64, _input: Json<UpdateReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<String> {
 
 /*
 	// TODO return error instead of None on invalid states
@@ -130,7 +130,8 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, db: Database<Reservatio
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
-pub fn delete(r_id: i32, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+pub fn delete(r_id: u64, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+
 /*	use crate::schema::booking::dsl::*;
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -166,7 +167,7 @@ pub fn delete(r_id: i32, db: Database<Reservations>, usr: AuthToken<Noob>) -> Op
 /// - `begin_time`: počáteční čas
 /// - `end_time`: čas konce
 #[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
-pub fn date_filter(rooms: i32, begin_time: String, end_time: String, db: Database<Reservations>, _u: AuthToken<Noob>) -> String {
+pub fn date_filter(rooms: u8, begin_time: String, end_time: String, db: Database<Reservations>, _u: AuthToken<Noob>) -> String {
 	rgi! {
 		FILTER "rgi/booking/booking.py"
 		arg: rooms,
@@ -182,7 +183,7 @@ pub fn date_filter(rooms: i32, begin_time: String, end_time: String, db: Databas
 /// parametry:
 /// - `id`: id rezervace
 #[post("/events/<id>/approve")]
-pub fn approve(id: i32, db: Database<Reservations>, _u: AuthToken<Approver>) -> String {
+pub fn approve(id: u64, db: Database<Reservations>, _u: AuthToken<Approver>) -> String {
 	rgi! {
 		APPROVE "rgi/booking/booking.py"
 		arg: id
