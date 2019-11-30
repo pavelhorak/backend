@@ -1,12 +1,13 @@
 //! contains database models and helper structs
 
 use serde::{Serialize, Deserialize};
+use auth::AuthToken;
 
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reservation {
 	/// primární klíč
-	pub id: i32,
+	pub id: u64,
 	/// název události
 	pub name: String,
 	/// popis události
@@ -22,17 +23,17 @@ pub struct Reservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms: i32,
+	pub rooms: u8,
 	/// počáteční čas rezervace
 	pub begin_time: String,
 	/// čas, kdy rezervace končí
 	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout: i32,
+	pub layout: u8,
 	/// zda byla rezervace schválena
-	pub approved: i32,
+	pub approved: bool,
 	/// počet lidí
-	pub people: i32,
+	pub people: i8,
 }
 
 /// Model rezervace pro přidání do databáze
@@ -58,9 +59,9 @@ pub struct NewReservation {
 	/// čas, kdy rezervace končí
 	pub end_time: String,
 	/// rozložení nábytku v audioriu
-	pub layout: u16,
+	pub layout: u8,
 	/// počet lidí
-	pub people: u16,
+	pub people: u8,
 }
 
 /// Weird quick models
@@ -86,9 +87,9 @@ pub struct UpdateReservation {
 	/// čas, kdy rezervace končí
 	pub end_time: Option<String>,
 	/// rozložení nábytku v audioriu
-	pub layout: Option<u16>,
+	pub layout: Option<u8>,
 	/// počet lidí
-	pub people: Option<u16>,
+	pub people: Option<u8>,
 }
 
 /// Model usera
@@ -96,13 +97,13 @@ pub struct UpdateReservation {
 #[allow(dead_code)]
 pub struct User {
 	/// identifikátor
-	pub id: i32,
+	pub id: u64,
 	/// jméno uživatele
 	pub name: String,
 	/// email
 	pub email: String,
 	/// role
-	pub role: String,
+	pub role: AuthToken,
 }
 
 /// Model usera pro vložení do databáze
@@ -114,5 +115,5 @@ pub struct NewUser {
 	/// email
 	pub email: String,
 	/// role
-	pub role: String,
+	pub role: AuthToken,
 }
