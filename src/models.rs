@@ -1,6 +1,7 @@
 //! contains database models and helper structs
 
 use serde::{Serialize, Deserialize};
+use auth::AuthToken;
 
 /// Model rezervace, tak jak je uložena v databázi
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -102,7 +103,7 @@ pub struct User {
 	/// email
 	pub email: String,
 	/// role
-	pub role: String,
+	pub role: AuthToken,
 }
 
 /// Model usera pro vložení do databáze
@@ -114,5 +115,5 @@ pub struct NewUser {
 	/// email
 	pub email: String,
 	/// role
-	pub role: String,
+	pub role: AuthToken,
 }
