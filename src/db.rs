@@ -6,6 +6,8 @@ use serde::{Serialize, Deserialize};
 use diesel::Connection;
 
 use std::env;
+use std::ops::Deref;
+
 use crate::schema::*;
 
 #[database("postgres_db")]

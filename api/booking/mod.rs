@@ -5,7 +5,7 @@ use crate::auth::AuthToken;
 use crate::auth::roles::{Noob, Approver, Role};
 
 use crate::db;
-use crate::db::{NewReservation, UpdateReservation, Reservation};
+use crate::db::{NewReservation, UpdateReservation, Reservation, DbConn};
 
 use diesel::prelude::*;
 
@@ -17,13 +17,11 @@ use diesel::prelude::*;
 ///
 /// GET /events "application/json"
 #[get("/events", format = "application/json")]
-pub fn list() -> Option<Json<Vec<Reservation>>> {
+pub fn list(conn: DbConn) -> Option<Json<Vec<Reservation>>> {
 	use crate::schema::booking::dsl::*;
-
-	let conn = db::get_con();
 	 
 	booking
-		.load::<Reservation>(&conn)
+		.load::<Reservation>((&*conn) as &diesel::SqliteConnection)
 		.ok()
 		.map(Json)
 }
@@ -35,14 +33,12 @@ pub fn list() -> Option<Json<Vec<Reservation>>> {
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[get("/events/<event_id>")]
-pub fn get(event_id: i32, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
+pub fn get(event_id: i32, conn: DbConn, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
 	use crate::schema::booking::dsl::*;
-
-	let conn = db::get_con();
 
 	booking
 		.find(event_id)
-		.first::<Reservation>(&conn)
+		.first::<Reservation>((&*conn) as &diesel::SqliteConnection)
 		.optional()
 		.ok()
 		.flatten()
@@ -105,11 +101,11 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 
 /// vymaže danou rezervaci
 ///
-/// DEL///
+/// DELETE /events/<id>/
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
-pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<()> {
+pub fn delete(r_id: i32, conn: DbConn, usr: AuthToken<Noob>) -> Option<()> {
 	use crate::schema::booking::dsl::*;
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
@@ -167,6 +163,6 @@ pub fn approve(id: i32, _u: AuthToken<Approver>) -> String {
 }
 
 /// vrací seznam endpointů pro nabindování do Rocketu
-pub fn routes() -> Vec<Route> {
+pub fn routes()conn: DbConn,  -> Vec<Route> {
 	routes![date_filter, list, approve, get, post, patch, delete,]
 }
