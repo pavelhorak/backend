@@ -41,33 +41,6 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-
-def get(data):
-    """
-    Get data from the database
-    :param data: {id}
-    :return: Booking dictionary or {result: number}
-    """
-    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
-    if len(results) == 1:
-        result = results[0]
-        user = session.query(Booking).filter(User.email == result.author).all()
-        setattr(result, "author_name", user[0].name)
-        return json.dumps(result, cls=AlchemyEncoder)
-    else:
-        return json.dumps({"result": 1})
-
-
-def list_(data):
-    """
-    List all the data
-    :param data:
-    :return: {results: array of result}
-    """
-    results = session.query(Booking).all()
-    return json.dumps(results, cls=AlchemyEncoder)
-
-
 def post(data):
     """
     Adds new data to db
@@ -132,21 +105,6 @@ def patch(data):
     else:
         return json.dumps({"result": 1})  # no result found by the id
 
-def delete(data):
-    """
-    Deletes event by it's id
-    :param data: {id}
-    :return: {result: number}
-    """
-
-    results = session.query(Booking).filter(Booking.id == data["args"]["id"]).all()
-    if len(results) == 1:
-        session.delete(results[0])
-        session.commit()
-        return json.dumps({"result": 0})
-    else:
-        return json.dumps({"result": 1})  # no result found by the id
-
 def approve(data):
     """
     Approvs event by it's id
@@ -175,7 +133,7 @@ def approve(data):
         return json.dumps({"result": 1})  # no result found by the id
 
 
-methods = {"list": list_, "get": get, "post": post, "patch": patch, "delete": delete, "approve" : approve}
+methods = {"patch": patch, "approve" : approve}
 txt = sys.stdin.read()
 txt = re.sub(",[ \t\r\n]+}", "}", txt)
 txt = re.sub(",[ \t\r\n]+\]", "]", txt)
