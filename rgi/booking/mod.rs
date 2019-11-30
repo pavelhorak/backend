@@ -86,8 +86,8 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 
 	if usr.user.role.to_lowercase() != Approver::name() {
 		use crate::schema::booking::dsl::*;
-
 		let con = db::get_con();
+
 		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
 
 		if reservation.author.trim() != usr.user.email.trim() {
@@ -109,14 +109,14 @@ pub fn patch(r_id: i32, _input: Json<UpdateReservation>, usr: AuthToken<Noob>) -
 /// parametry:
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<r_id>")]
-pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
+pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<()> {
+	use crate::schema::booking::dsl::*;
 	// TODO return error instead of None on invalid states
 	if r_id < 0 {
 		None?
 	}
 
 	if usr.user.role.to_lowercase() != Approver::name() {
-		use crate::schema::booking::dsl::*;
 
 		let con = db::get_con();
 		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
@@ -126,11 +126,12 @@ pub fn delete(r_id: i32, usr: AuthToken<Noob>) -> Option<String> {
 		}
 	}
 
-	let id = r_id;
-	Some(rgi! {
-		DELETE "rgi/booking/booking.py"
-		arg: id
-	})
+	let conn = db::get_con();
+
+	diesel::delete(booking.find(r_id))
+		.execute(&conn)
+		.ok()
+		.map(|_| ())
 }
 
 /// filtruje podle data
