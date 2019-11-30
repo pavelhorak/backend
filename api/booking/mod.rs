@@ -2,6 +2,7 @@ use rocket::Route;
 use rocket_contrib::json::Json;
 
 use serde_cbor;
+use chrono::DateTime;
 
 use crate::auth::AuthToken;
 use crate::auth::roles::{Noob, Approver, Role};
@@ -26,11 +27,6 @@ use crate::models::{NewReservation, UpdateReservation, Reservation};
 pub fn list(db: Database<Reservations>) -> Json<Vec<(u64, Reservation)>> {
 	Json(
 		db.read().iter()
-			.filter_map(|r| r.ok())
-			.map(|(k, v)| (serde_cbor::from_slice(&k), (serde_cbor::from_slice(&v))))
-			// omit invalid data
-			.filter(|(a, b)| a.is_ok() && b.is_ok())
-			.map(|(a, b)| (a.unwrap(), b.unwrap()))
 			.collect::<Vec<(u64, Reservation)>>()
 	)
 }
@@ -44,9 +40,7 @@ pub fn list(db: Database<Reservations>) -> Json<Vec<(u64, Reservation)>> {
 #[get("/events/<event_id>")]
 pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
 	db.read()
-		.get(serde_cbor::to_vec(&event_id).unwrap()) // can't fail
-		.ok()?
-		.map(|x| serde_cbor::from_slice(&x).ok())?
+		.get(event_id) // can't fail
 		.map(Json)
 }
 
@@ -56,7 +50,20 @@ pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Op
 ///
 /// data: [`NewReservation`]
 #[post("/events", data = "<input>")]
-pub fn post(input: Json<NewReservation>, usr: AuthToken<Noob>) -> Option<()> {
+pub fn post(input: Json<NewReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+	if db.read()
+		.iter()
+		.filter(|(_, x)| x.approved == 1)
+			// todo time-checking
+			//&& (x.rooms == 3 || x.rooms == input.rooms))
+		.count() != 0
+	{
+		None?
+	}
+
+	//db.write()
+	//	.insert
+
 	/*use crate::schema::booking::dsl::*;
 
 	if booking

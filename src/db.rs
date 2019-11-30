@@ -6,11 +6,15 @@ use rocket::http::Status;
 
 use serde::{Serialize, Deserialize};
 use sled::{Db, Tree};
+use serde_cbor;
 
 use std::env;
-use std::ops::Deref;
 use std::sync::RwLock;
+use std::borrow::Borrow;
+use std::iter::Iterator;
+use std::iter::FilterMap;
 use std::marker::PhantomData;
+
 
 lazy_static! {
 	/// a global handle to the Sled database
@@ -21,18 +25,68 @@ lazy_static! {
 	});
 }
 
+/// manages a tree and ensures it's type safety
+/// also allows automatic type conversions
+pub struct TreeMan<K, V>
+where
+	for <'a> K: Serialize + Deserialize<'a>,
+	for <'b> V: Serialize + Deserialize<'b>, 
+{
+	tree: Tree,
+	_k: PhantomData<K>,
+	_v: PhantomData<V>,
+}
+
+impl<K, V> TreeMan<K, V>
+where
+	for <'a> K: Serialize + Deserialize<'a>,
+	for <'b> V: Serialize + Deserialize<'b>,
+{
+	/// create a new tree manager from a tree
+	pub fn from_tree(tree: Tree) -> Self {
+		Self { tree, _k: PhantomData, _v: PhantomData }
+	}
+
+	/// creates an iterator over (K, V)
+	pub fn iter(&self) -> impl Iterator<Item=(K, V)> {
+		self.tree
+			.iter()
+			.filter_map(|res| {
+				if let Ok((k, v)) = res {
+					Some((serde_cbor::from_slice::<K>(&k).ok()?, serde_cbor::from_slice::<V>(&v).ok()?))
+				} else { None }
+			})
+	}
+
+	/// try to get a value from the database
+	pub fn get<Key: Borrow<K>>(&self, k: Key) -> Option<V> {
+		self.tree
+			.get(serde_cbor::to_vec(k.borrow()).unwrap()) // can't fail
+			.ok()
+			.flatten()
+			.and_then(|v| Some(serde_cbor::from_slice::<V>(&*v).ok()))
+			.flatten()
+	}
+
+	/// try to insert into database
+	pub fn insert<Key: Borrow<K>, Value: Borrow<V>>(&mut self, k: Key, v: Value) -> sled::Result<Option<sled::IVec>> {
+		self.tree
+			.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap()) // can't fail
+	}
+}
+
 /// wraps the database
 ///
 /// the reasons are two:
 /// 1. to allow  FromRequest implementation
 /// 2. declarative table access
-pub struct Database<T: Table>(Tree, PhantomData<T>);
+pub struct Database<T: Table>(TreeMan<T::Key, T::Value>, PhantomData<T>);
 
 impl<T: Table> Database<T> {
 	/// read-only access to tree
-	pub fn read(&self) -> &Tree { &self.0 }
+	pub fn read(&self) -> &TreeMan<T::Key, T::Value> { &self.0 }
 	/// read and write access to tree
-	pub fn write(&mut self) -> &mut Tree { &mut self.0 }
+	pub fn write(&mut self) -> &mut TreeMan<T::Key, T::Value> { &mut self.0 }
 }
 
 /// trait for the Table marker types
@@ -40,6 +94,10 @@ pub trait Table {
 	/// opening a table might not always work,
 	/// this type should explain what's the issue
 	type TableError = sled::Error;
+	/// type of the key/ID
+	type Key: Serialize + for<'a> Deserialize<'a>;
+	/// type of the value
+	type Value: Serialize + for<'b> Deserialize<'b>;
 
 	/// name (actually prefix) of the table
 	fn name() -> &'static str;
@@ -64,11 +122,14 @@ pub trait Table {
 /// module containing table markers
 pub mod table {
 	use super::Table;
+	use crate::models::{Reservation, User};
 
 	/// Reservation database table marker
 	pub struct Reservations;
 
 	impl Table for Reservations {
+		type Key = u64;
+		type Value = Reservation;
 		fn name() -> &'static str { "reservation" }
 	}
 
@@ -76,6 +137,8 @@ pub mod table {
 	pub struct Users;
 
 	impl Table for Users {
+		type Key = u64;
+		type Value = User;
 		fn name() -> &'static str { "user" }
 	}
 }
@@ -86,12 +149,12 @@ impl<'a, 'r, T: Table> FromRequest<'a, 'r> for Database<T> {
 	fn from_request(_: &'a Request<'r>) -> Outcome<Self, Self::Error> {
 		if T::has_get_tree() {
 			match T::get_tree() {
-				Ok(tree) => Outcome::Success(Database(tree, PhantomData)),
+				Ok(t) => Outcome::Success(Database(TreeMan::from_tree(t), PhantomData)),
 				Err(_) => Outcome::Failure((Status::InternalServerError, "failed to run custom database function and acquire tree".to_string())),
 			}
 		} else {
 			match T::get_tree_naive() {
-				Ok(tree) => Outcome::Success(Database(tree, PhantomData)),
+				Ok(t) => Outcome::Success(Database(TreeMan::from_tree(t), PhantomData)),
 				Err(_) => Outcome::Failure((Status::InternalServerError, "failed to acquire tree".to_string())),
 			}
 		}

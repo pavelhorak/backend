@@ -54,6 +54,7 @@ extern crate lazy_static;
 
 extern crate serde_cbor;
 extern crate dotenv;
+extern crate chrono;
 extern crate serde;
 extern crate sled;
 
