@@ -63,7 +63,7 @@ pub mod roles {
 	pub trait Role {
 		/// jméno role jako string
 		fn name() -> &'static str;
-		/// jméno rodiše jako string
+		/// jméno rodiče jako string
 		fn daddy() -> Option<&'static str> {
 			None
 		}
