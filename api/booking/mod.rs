@@ -40,12 +40,14 @@ pub fn get(id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<J
 /// data: [`NewReservation`]
 #[post("/events", data = "<input>")]
 pub fn post(input: Json<NewReservation>, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
-	if db.read().iter().any(|(_, x)| {
-		x.approved == true
+	let has_conflict = db.read().iter().any(|(_, x)| {
+		x.approved
 			&& x.begin_time <= input.end_time
 			&& x.end_time >= input.begin_time
 			&& (x.rooms == 3 || x.rooms == input.rooms)
-	}) {
+	});
+
+	if has_conflict {
 		return None; // todo proper errors
 	}
 
@@ -53,7 +55,7 @@ pub fn post(input: Json<NewReservation>, mut db: Database<Reservations>, usr: Au
 
 	new_res.author = usr.user.email;
 
-	db.write().insert(Database::<Reservations>::get_key().unwrap(), new_res).ok()?.and_then(|_| Some(()))
+	db.write().insert(Database::<Reservations>::get_key().unwrap(), new_res).ok()?.map(|_| ())
 }
 
 /// upraví danou rezervaci
@@ -78,31 +80,31 @@ pub fn patch(
 		return None;
 	}
 
-	if db
+	let update_result = db
 		.write()
 		.update::<_, Reservation, _>(id, |val| {
 			if let Some(mut val) = val {
 				match input.clone() {
 					UpdateReservation { name, description, rooms, begin_time, end_time, layout, people } => {
-						name.and_then(|x| Some({ val.name = x }));
-						description.and_then(|x| Some({ val.description = x }));
-						rooms.and_then(|x| Some({ val.rooms = x }));
-						begin_time.and_then(|x| Some({ val.begin_time = x }));
-						end_time.and_then(|x| Some({ val.end_time = x }));
-						layout.and_then(|x| Some({ val.layout = x }));
-						people.and_then(|x| Some({ val.people = x }));
+						name.map(|x| { val.name = x });
+						description.map(|x| { val.description = x });
+						rooms.map(|x| { val.rooms = x });
+						begin_time.map(|x| { val.begin_time = x });
+						end_time.map(|x| { val.end_time = x });
+						layout.map(|x| { val.layout = x });
+						people.map(|x| { val.people = x });
 					}
 				}
 
 				val.approved = false;
 
-				Some(val.clone())
+				Some(val)
 			} else {
 				None
 			}
-		})
-		.is_err()
-	{
+		});
+
+	if update_result.is_err() {
 		return None;
 	}
 

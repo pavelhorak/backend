@@ -17,9 +17,8 @@ use std::marker::PhantomData;
 lazy_static! {
 	/// a global handle to the Sled database
 	pub static ref DB: RwLock<Db> = RwLock::new({
-		let db = Db::open(&env::var("DATABASE_URL").expect("failed to read DATABASE_URL environment variable"))
-			.expect("failed to open database");
-		db
+		Db::open(&env::var("DATABASE_URL").expect("failed to read DATABASE_URL environment variable"))
+			.expect("failed to open database")
 	});
 }
 
@@ -62,7 +61,7 @@ where
 			.get(serde_cbor::to_vec(k.borrow()).unwrap()) // can't fail
 			.ok()
 			.flatten()
-			.and_then(|v| Some(serde_cbor::from_slice::<V>(&*v).ok()))
+			.map(|v| serde_cbor::from_slice::<V>(&*v).ok())
 			.flatten()
 	}
 
@@ -112,7 +111,7 @@ impl<T: Table> Database<T> {
 
 	/// procures a new random u64 key
 	pub fn get_key() -> sled::Result<u64> {
-		let ref lock = DB.read().expect("the rwlock has been poisoned");
+		let lock = DB.read().expect("the rwlock has been poisoned");
 		lock.generate_id()
 	}
 
