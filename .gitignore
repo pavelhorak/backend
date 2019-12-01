@@ -155,4 +155,4 @@ dmypy.json
 .pyre/
 
 # database
-auditorium_booking.sqlite3
+auditorium__booking.sled.db/

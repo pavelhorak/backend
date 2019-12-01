@@ -9,6 +9,7 @@ use sled::{Db, Tree};
 use serde_cbor;
 
 use std::env;
+use std::ops::Drop;
 use std::sync::RwLock;
 use std::borrow::Borrow;
 use std::iter::Iterator;
@@ -67,7 +68,9 @@ where
 
 	/// try to insert into database
 	pub fn insert<Key: Borrow<K>, Value: Borrow<V>>(&mut self, k: Key, v: Value) -> sled::Result<Option<sled::IVec>> {
-		self.tree.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap())
+		let tmp = self.tree.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap());
+		println!("{:?}", tmp);
+		tmp
 		// can't fail
 	}
 
@@ -206,5 +209,12 @@ impl<'a, 'r, T: Table> FromRequest<'a, 'r> for Database<T> {
 				false => "failed to load database",
 			}))
 		}
+	}
+}
+
+impl<T: Table> Drop for Database<T> {
+	fn drop(&mut self) {
+		self.0.tree.flush();
+		println!("tree {}: {}", String::from_utf8_lossy(&self.0.tree.name()), self.0.tree.len())
 	}
 }

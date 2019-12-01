@@ -16,9 +16,9 @@ use crate::db::{
 use crate::models::{User, Reservation};
 
 /// geenrates a superadmin
-#[post("/generate_sa/<email>/<password>", format = "application/json")]
+#[post("/generate_sa/<email>/<password>")]
 pub fn generate_superadmin(email: String, password: String, mut db: Database<Users>) -> Option<()> {
-	if password != env::var("SECRET_PASSWORD").unwrap() { return None }
+	if password != env::var("SA_SECRET").unwrap() { return None }
 
 	db.write()
 		.insert(&email, User { email: email.clone(), name: "Superadmin".to_string(), role: Superadmin::name().to_string() })
@@ -35,5 +35,5 @@ pub fn users(db: Database<Users>, _u: AuthToken<Superadmin>) -> Json<Vec<(String
 
 /// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![users]
+	routes![users, generate_superadmin]
 }

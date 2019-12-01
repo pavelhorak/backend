@@ -20,7 +20,8 @@ fn main() {
 	let rocket = init();
 	let client = Client::new(rocket).expect("rocket instance is not valid");
 
-	ferrisprint!("Superadmin generation tool v1.0");
+	println!();
+	ferrisprint!("Superadmin generator v1");
 
 	let admin_email = scanln!("[{}] {}", Paint::magenta("rust booking"), Paint::yellow("please insert superadmin login email:"));
 
@@ -29,7 +30,7 @@ fn main() {
 	let password = env::var("SA_SECRET").unwrap();
 
 	println!("[{}] {}", Paint::magenta("rust booking"), Paint::yellow("generating superadmin"));
-	let req = client.post(format!("/generate_sa/{}/{}", admin_email, password)).dispatch();
+	let req = client.post(format!("/admin/generate_sa/{}/{}", admin_email, password)).dispatch();
 
 	if req.status() != Status::NotFound {
 		 println!("[{}] {}", Paint::magenta("rust booking"), Paint::yellow("failed to generate superadmin account"))
