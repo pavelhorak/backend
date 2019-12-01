@@ -16,6 +16,9 @@ base64 = "0.11.0"
 sled = "0.29"
 lazy_static = "1.4"
 serde_cbor = "0.10.2"
+ferris_print = "0.1"
+scanln = "0.1"
+yansi = "0.5"
 
 [dependencies.chrono]
 version = "0.4.10"
