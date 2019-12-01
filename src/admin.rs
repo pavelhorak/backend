@@ -32,8 +32,24 @@ pub fn users(db: Database<Users>, _u: AuthToken<Superadmin>) -> Json<Vec<(String
 	Json(db.read().iter().collect::<Vec<(String, User)>>())
 }
 
+/// change user role
+#[patch("/users/<email>/<new_role>", format = "application/json")]
+pub fn change_role(email: String, new_role: String, mut db: Database<Users>, _u: AuthToken<Superadmin>) -> Option<()> {
+	if !["Noob", "Superadmin", "Approver", "FacilityManager"].contains(&new_role.as_str()) {
+		return None;
+	}
+
+	db.write()
+		.update::<_, User, _>(email, |x| if let Some(mut x) = x {
+			x.role = new_role.clone();
+			Some(x)
+		} else {None}).ok()?;
+
+	Some(())
+}
+
 
 /// vrací seznam endpointů pro nabindování do Rocketu
 pub fn routes() -> Vec<Route> {
-	routes![users, generate_superadmin]
+	routes![users, generate_superadmin, change_role]
 }

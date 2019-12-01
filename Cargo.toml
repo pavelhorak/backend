@@ -3,6 +3,7 @@ name = "backend"
 version = "0.1.0"
 authors = ["Dawid J. Kubis <dawidk.kubis3@gmail.com>", "Lukáš Hozda <luk.hozda@gmail.com>", "Lukáš Veškrna <lukas.veskrna@gmail.com>"]
 edition = "2018"
+default-run = "backend"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
