@@ -99,7 +99,7 @@ pub mod roles {
 	}
 
 	macro_rules! role_gen {
-		{$($role:ident [$daddy:ident] $(-> $is_root:literal)? ),*} => {
+		{$($role:ident [$daddy:ident] $(-> $is_root:literal)? ),* $(,)?} => {
 			$(
 				pub struct $role;
 				impl Role for $role {
@@ -112,9 +112,10 @@ pub mod roles {
 	 }
 
 	role_gen! {
-	   Noob[Noob]            -> true,
-	   Approver[Noob]        -> false,
-	   FacilityManager[Noob] -> false
+		Noob[Noob]            -> true,
+		Approver[Noob]        -> false,
+		FacilityManager[Noob] -> false,
+		Superadmin[Approver]  -> false,
 	}
 }
 

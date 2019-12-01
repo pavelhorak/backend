@@ -62,8 +62,9 @@ use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 pub mod static_server;
+pub mod booking;
+pub mod admin;
 pub mod auth;
-pub mod api;
 
 pub mod db;
 pub mod models;
@@ -89,6 +90,7 @@ pub fn init() -> rocket::Rocket {
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
 		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon, auth::me])
-		.mount("/api/", api::routes())
+		.mount("/api/", booking::routes())
+		.mount("/admin/", admin::routes())
 		.attach(cors)
 }
