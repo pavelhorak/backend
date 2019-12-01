@@ -118,10 +118,12 @@ pub fn patch(
 /// - `id`: identifikátor dané rezervace
 #[delete("/events/<id>")]
 pub fn delete(id: u64, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+	use crate::auth::roles::Role;
+
 	let event = db.read().get(id)?;
 
 	// TODO  roles are uggly
-	if event.author != usr.user.email || usr.user.role != "approver" {
+	if event.author != usr.user.email || usr.user.role != Approver::name() {
 		None?
 	}
 
@@ -166,11 +168,26 @@ pub fn date_filter(
 /// parametry:
 /// - `id`: id rezervace
 #[post("/events/<id>/approve")]
-pub fn approve(id: u64, db: Database<Reservations>, _u: AuthToken<Approver>) -> String {
-	rgi! {
-		APPROVE "rgi/booking/booking.py"
-		arg: id
+pub fn approve(id: u64, mut db: Database<Reservations>, _u: AuthToken<Approver>) -> Option<()> {
+	let event = db.read().get(id)?;
+
+	// TODO maybe also delete conflicting events
+	let has_conflict = db.read().iter().any(|(_, x)| {
+		x.approved
+			&& x.begin_time <= event.end_time
+			&& x.end_time >= event.begin_time
+			&& (x.rooms == 3 || x.rooms == event.rooms)
+	});
+
+	if !has_conflict {
+		db.write()
+			.update::<_, Reservation, _>(id, |x| if let Some(mut x) = x {
+				x.approved = true;
+				Some(x)
+			} else {None}).ok()?;
 	}
+
+	Some(())
 }
 
 /// vrací seznam endpointů pro nabindování do Rocketu
