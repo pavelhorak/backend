@@ -19,11 +19,14 @@ use base64::decode;
 
 use std::marker::PhantomData;
 
-use crate::db;
-use crate::models::{NewUser, User};
+use crate::db::{
+	Database,
+	table::Users,
+};
+use crate::models::User;
 
 /// autorizační token, tak jak je přijat
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthTokenRaw {
 	/// jméno uživatele
 	pub name: String,
@@ -31,8 +34,21 @@ pub struct AuthTokenRaw {
 	pub email: String,
 }
 
+impl AuthTokenRaw {
+	/// converts a raw AuthToken into user
+	pub fn into_user(self) -> User {
+		use self::roles::Role;
+
+		User {
+			name: self.name,
+			email: self.email,
+			role: roles::Noob::name().to_string(),
+		}
+	}
+}
+
 /// autorizační token po vyřešení údajů s databází
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthToken<T: roles::Role> {
 	/// nalezený uživatel
 	pub user: User,
@@ -58,33 +74,47 @@ impl<T: roles::Role> AuthToken<T> {
 pub mod roles {
 	#![allow(dead_code, missing_docs)]
 
-	/// sdílený trait pro role
-	/// velmi rudimentárním způsobem reprezentuje hierarchii
+	/// common trait for roles
+	/// comes with basic compile-time hierarchy
 	pub trait Role {
-		/// jméno role jako string
+		/// this role's daddy, can be set to self if role is root
+		type Daddy: Role;
+
+		/// name of role as str
 		fn name() -> &'static str;
+
+		/// whether the role is root role
+		fn is_root() -> bool { false }
+
 		/// jméno rodiče jako string
-		fn daddy() -> Option<&'static str> {
-			None
+		fn resolve_daddy() -> Vec<&'static str> {
+			if Self::is_root() {
+				vec![]
+			} else {
+				let mut v = vec![Self::name()];
+				v.append(&mut Self::Daddy::resolve_daddy());
+				v
+			}
 		}
 	}
 
 	macro_rules! role_gen {
-		{$(($role:ident -> $daddy:expr))*} => {
+		{$($role:ident [$daddy:ident] $(-> $is_root:literal)? ),*} => {
 			$(
 				pub struct $role;
 				impl Role for $role {
+					type Daddy = $daddy;
 					fn name() -> &'static str { stringify!($role) }
-					fn daddy() -> Option<&'static str> { $daddy }
+					$(fn is_root() -> bool { $is_root })?
 				}
 			)*
 		}
 	 }
 
 	role_gen! {
-	   (Noob -> None)
-	   (Approver -> Some("noob"))
-	   (FacilityManager -> Some("noob"))
+	   Noob[Noob]            -> true,
+	   Approver[Noob]        -> false,
+	   FacilityManager[Noob] -> false
 	}
 }
 
@@ -92,12 +122,14 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 	type Error = String;
 
 	fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
-		/*use crate::schema::users::dsl::*;
+		let mut db = match Database::<Users>::open() {
+			Some(d) => d,
+			None => return Outcome::Failure((Status::InternalServerError, "failed to connect to db".to_string())),
+		};
 
 		let keys: Vec<_> = request.headers().get("Authorization").collect();
 		match keys.get(0).unwrap_or(&"").split(' ').nth(1) {
 			Some(ref token) => {
-				eprintln!("decoding");
 				let body = match decode(token) {
 					Ok(bod) => bod,
 					Err(_) =>
@@ -107,7 +139,6 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 						)),
 				};
 
-				eprintln!("parsing");
 				let token: AuthTokenRaw = match serde_json::from_str(&String::from_utf8_lossy(&body).to_string()) {
 					Ok(tok) => tok,
 					Err(e) =>
@@ -119,40 +150,28 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 
 				//... pošéfit databázi zde
 
-				let connection = db::get_con();
+				let result = if let Some((_, u)) = db.read()
+					.iter()
+					.find(|(_, u)| u.email == token.email)
+				{ u } else {
+					let new_u = token.clone().into_user();
 
-				let result = users
-					.filter(email.eq(&token.email))
-					.first::<User>(&connection)
-					.optional()
-					.expect("failed to connect to db")
-					.unwrap_or_else(|| {
-						// unfortunately, SQLite does not support the RETURNING clause, so one has to do this atrocity
-						diesel::insert_into(users)
-							.values(NewUser {
-								name:  token.name.clone(),
-								email: token.email.clone(),
-								role:  "noob".to_string(),
-							})
-							.execute(&connection)
-							.expect("failed to connect to db or insert item");
-
-						users
-							.filter(email.eq(&token.email))
-							.first::<User>(&connection)
-							.unwrap_or_else(|_| unreachable!("uh oh, this shouldn't happen, is your DB okay?"))
-					});
-
-				if T::name().to_lowercase() == result.role.to_lowercase() {
-					Outcome::Success(AuthToken::from_user(result))
-				} else if let Some(daddy) = T::daddy() {
-					println!("{}", daddy);
-					match daddy.to_lowercase() == result.role.to_lowercase() {
-						true => Outcome::Success(AuthToken::from_user(result)),
-						false => Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string())),
+					if db.write()
+						.insert(token.email, &new_u)
+						.is_err()
+					{
+						return Outcome::Failure((
+							Status::InternalServerError,
+							"failed to insert user into DB".to_string(),
+						))
 					}
+
+					new_u
+				};
+
+				if T::name() == result.role || T::resolve_daddy().contains(&result.role.as_str()) {
+					Outcome::Success(AuthToken::from_user(result))
 				} else {
-					println!("yeetus that feetus?");
 					Outcome::Failure((Status::Forbidden, "you don't have the required role".to_string()))
 				}
 			}
@@ -160,13 +179,12 @@ impl<'a, 'r, T: roles::Role> FromRequest<'a, 'r> for AuthToken<T> {
 				println!("{:?}", x);
 				Outcome::Failure((Status::BadRequest, "invalid authorization header".to_string()))
 			}
-		}*/
-		unimplemented!()
+		}
 	}
 }
 
 /// vrací informace o uživatelu
 #[get("/me")]
-pub fn me(_u: AuthToken<self::roles::Approver>) -> Json<User> {
+pub fn me(_u: AuthToken<self::roles::Noob>) -> Json<User> {
 	Json(_u.user)
 }

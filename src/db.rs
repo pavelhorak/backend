@@ -185,7 +185,7 @@ pub mod table {
 	pub struct Users;
 
 	impl Table for Users {
-		type Key = u64;
+		type Key = String;
 		type Value = User;
 
 		fn name() -> &'static str {

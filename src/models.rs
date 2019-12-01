@@ -119,13 +119,3 @@ pub struct User {
 	/// role
 	pub role: String,
 }
-
-/// Model usera pro vložení do databáze
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[allow(dead_code)]
-pub struct NewUser {
-	/// jmeno
-	pub name: String,
-	/// email
-	pub email: String,
-}
