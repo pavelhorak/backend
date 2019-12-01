@@ -90,6 +90,12 @@ where
 				}
 			)
 	}
+
+	/// remove a value
+	pub fn delete<Key: Borrow<K>>(&mut self, k: Key) -> sled::Result<Option<sled::IVec>> {
+		self.tree
+			.remove(serde_cbor::to_vec(k.borrow()).unwrap())
+	}
 }
 
 /// wraps the database

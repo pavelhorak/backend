@@ -35,10 +35,10 @@ pub fn list(db: Database<Reservations>) -> Json<Vec<(u64, Reservation)>> {
 ///
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[get("/events/<event_id>")]
-pub fn get(event_id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
+#[get("/events/<id>")]
+pub fn get(id: u64, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<Json<Reservation>> {
 	db.read()
-		.get(event_id) // can't fail
+		.get(id) // can't fail
 		.map(Json)
 }
 
@@ -79,34 +79,19 @@ pub fn post(input: Json<NewReservation>, mut db: Database<Reservations>, usr: Au
 /// - `id`: identifikátor dané rezervace
 ///
 /// data:[`UpdateReservation`]
-#[patch("/events/<r_id>", data = "<_input>")]
-pub fn patch(r_id: u64, _input: Json<UpdateReservation>, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<String> {
+#[patch("/events/<id>", data = "<_input>")]
+pub fn patch(id: u64, _input: Json<UpdateReservation>, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+	let event = db.read()
+		.get(id)?;
 
-/*
-	// TODO return error instead of None on invalid states
-	if r_id < 0 {
+	// TODO  roles are uggly
+	if event.author != usr.user.email || usr.user.role != "approver" {
 		None?
 	}
 
-	if usr.user.role.to_lowercase() != Approver::name() {
-		use crate::schema::booking::dsl::*;
-		let con = db::get_con();
-
-		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
-
-		if reservation.author.trim() != usr.user.email.trim() {
-			None? // you shouldn't be able to edit others' events
-		}
-	}
-
-	let id = r_id;
-	Some(rgi! {
-		PATCH "rgi/booking/booking.py"
-		arg: id
-		data: (&_input.into_inner())
-	})
-*/
-	unimplemented!()
+	// TODO actual patching
+	
+	Some(())
 }
 
 /// vymaže danou rezervaci
@@ -114,33 +99,22 @@ pub fn patch(r_id: u64, _input: Json<UpdateReservation>, db: Database<Reservatio
 /// DELETE /events/<id>/
 /// parametry:
 /// - `id`: identifikátor dané rezervace
-#[delete("/events/<r_id>")]
-pub fn delete(r_id: u64, db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+#[delete("/events/<id>")]
+pub fn delete(id: u64, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+	let event = db.read()
+		.get(id)?;
 
-/*	use crate::schema::booking::dsl::*;
-	// TODO return error instead of None on invalid states
-	if r_id < 0 {
+	// TODO  roles are uggly
+	if event.author != usr.user.email || usr.user.role != "approver" {
 		None?
 	}
 
-	if usr.user.role.to_lowercase() != Approver::name() {
-
-		let con = db::get_con();
-		let reservation = booking.filter(id.eq(r_id)).first::<Reservation>(&con).ok()?;
-
-		if reservation.author.trim() != usr.user.email.trim() {
-		None? // you shouldn't be able to delete others' either
-		}
-	}
-
-	let conn = db::get_con();
-
-	diesel::delete(booking.find(r_id))
-		.execute(&conn)
-		.ok()
-		.map(|_| ())
-*/
-	unimplemented!()
+	db
+		.write()
+		.delete(id)
+		.ok()?;
+	
+	Some(())
 }
 
 /// filtruje podle data
@@ -152,13 +126,18 @@ pub fn delete(r_id: u64, db: Database<Reservations>, usr: AuthToken<Noob>) -> Op
 /// - `begin_time`: počáteční čas
 /// - `end_time`: čas konce
 #[get("/events/filter/<rooms>/<begin_time>/<end_time>")]
-pub fn date_filter(rooms: u8, begin_time: String, end_time: String, db: Database<Reservations>, _u: AuthToken<Noob>) -> String {
-	rgi! {
-		FILTER "rgi/booking/booking.py"
-		arg: rooms,
-		arg: begin_time,
-		arg: end_time
-	}
+pub fn date_filter(rooms: u8, begin_time: String, end_time: String, db: Database<Reservations>, _u: AuthToken<Noob>) -> Option<Json<Vec<(u64, Reservation)>>> {
+	use chrono::{DateTime, offset::Utc};
+	let begin_time = DateTime::<Utc>::from(DateTime::parse_from_rfc3339(&begin_time).ok()?);
+	let end_time = DateTime::<Utc>::from(DateTime::parse_from_rfc3339(&end_time).ok()?);
+
+	Some(Json(
+		db.read()
+			.iter()
+			.filter(|(_, v)| v.begin_time >= begin_time && v.begin_time <= end_time)
+			.filter(|(_, v)| v.rooms == rooms)
+			.collect::<Vec<(u64, Reservation)>>()
+	))
 }
 
 /// schválí endpoint
