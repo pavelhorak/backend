@@ -1,3 +1,4 @@
+//! a module containing  booking functionality
 use rocket::Route;
 use rocket_contrib::json::Json;
 
