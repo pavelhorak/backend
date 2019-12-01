@@ -14,7 +14,6 @@ use std::borrow::Borrow;
 use std::iter::Iterator;
 use std::marker::PhantomData;
 
-
 lazy_static! {
 	/// a global handle to the Sled database
 	pub static ref DB: RwLock<Db> = RwLock::new({
@@ -28,18 +27,18 @@ lazy_static! {
 /// also allows automatic type conversions
 pub struct TreeMan<K, V>
 where
-	for <'a> K: Serialize + Deserialize<'a>,
-	for <'b> V: Serialize + Deserialize<'b>, 
+	for<'a> K: Serialize + Deserialize<'a>,
+	for<'b> V: Serialize + Deserialize<'b>,
 {
 	tree: Tree,
-	_k: PhantomData<K>,
-	_v: PhantomData<V>,
+	_k:   PhantomData<K>,
+	_v:   PhantomData<V>,
 }
 
 impl<K, V> TreeMan<K, V>
 where
-	for <'a> K: Serialize + Deserialize<'a>,
-	for <'b> V: Serialize + Deserialize<'b>,
+	for<'a> K: Serialize + Deserialize<'a>,
+	for<'b> V: Serialize + Deserialize<'b>,
 {
 	/// create a new tree manager from a tree
 	pub fn from_tree(tree: Tree) -> Self {
@@ -47,14 +46,14 @@ where
 	}
 
 	/// creates an iterator over (K, V)
-	pub fn iter(&self) -> impl Iterator<Item=(K, V)> {
-		self.tree
-			.iter()
-			.filter_map(|res| {
-				if let Ok((k, v)) = res {
-					Some((serde_cbor::from_slice::<K>(&k).ok()?, serde_cbor::from_slice::<V>(&v).ok()?))
-				} else { None }
-			})
+	pub fn iter(&self) -> impl Iterator<Item = (K, V)> {
+		self.tree.iter().filter_map(|res| {
+			if let Ok((k, v)) = res {
+				Some((serde_cbor::from_slice::<K>(&k).ok()?, serde_cbor::from_slice::<V>(&v).ok()?))
+			} else {
+				None
+			}
+		})
 	}
 
 	/// try to get a value from the database
@@ -69,8 +68,8 @@ where
 
 	/// try to insert into database
 	pub fn insert<Key: Borrow<K>, Value: Borrow<V>>(&mut self, k: Key, v: Value) -> sled::Result<Option<sled::IVec>> {
-		self.tree
-			.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap()) // can't fail
+		self.tree.insert(serde_cbor::to_vec(k.borrow()).unwrap(), serde_cbor::to_vec(v.borrow()).unwrap())
+		// can't fail
 	}
 
 	/// update a key
@@ -80,21 +79,16 @@ where
 		Value: Borrow<V>,
 		F: Fn(Option<V>) -> Option<V>,
 	{
-		self.tree
-			.update_and_fetch(
-				serde_cbor::to_vec(k.borrow()).unwrap(),
-				|value| {
-					let value = value.and_then(|val| serde_cbor::from_slice(val.borrow()).ok());
-					let res = fun(value);
-					res.and_then(|v| serde_cbor::to_vec(v.borrow()).ok())
-				}
-			)
+		self.tree.update_and_fetch(serde_cbor::to_vec(k.borrow()).unwrap(), |value| {
+			let value = value.and_then(|val| serde_cbor::from_slice(val.borrow()).ok());
+			let res = fun(value);
+			res.and_then(|v| serde_cbor::to_vec(v.borrow()).ok())
+		})
 	}
 
 	/// remove a value
 	pub fn delete<Key: Borrow<K>>(&mut self, k: Key) -> sled::Result<Option<sled::IVec>> {
-		self.tree
-			.remove(serde_cbor::to_vec(k.borrow()).unwrap())
+		self.tree.remove(serde_cbor::to_vec(k.borrow()).unwrap())
 	}
 }
 
@@ -107,10 +101,14 @@ pub struct Database<T: Table>(TreeMan<T::Key, T::Value>, PhantomData<T>);
 
 impl<T: Table> Database<T> {
 	/// read-only access to tree
-	pub fn read(&self) -> &TreeMan<T::Key, T::Value> { &self.0 }
+	pub fn read(&self) -> &TreeMan<T::Key, T::Value> {
+		&self.0
+	}
 
 	/// read and write access to tree
-	pub fn write(&mut self) -> &mut TreeMan<T::Key, T::Value> { &mut self.0 }
+	pub fn write(&mut self) -> &mut TreeMan<T::Key, T::Value> {
+		&mut self.0
+	}
 
 	/// procures a new random u64 key
 	pub fn get_key() -> sled::Result<u64> {
@@ -148,20 +146,23 @@ pub trait Table {
 	fn name() -> &'static str;
 	/// gets the actual tree, should do it using the global DB handle
 	fn get_tree_naive() -> Result<Tree, sled::Error> {
-		let lock = DB.read()
-			.expect("the database rwlock has been poisoned");
-			// ^ this usually implies a deeper underlying problem,
-			// so it's probably okay to hard crash
+		let lock = DB.read().expect("the database rwlock has been poisoned");
+		// ^ this usually implies a deeper underlying problem,
+		// so it's probably okay to hard crash
 
 		lock.open_tree(&Self::name())
 	}
 
 	/// should return true if a custom get tree function is available
-	fn has_get_tree() -> bool { false }
- 
+	fn has_get_tree() -> bool {
+		false
+	}
+
 	/// optional custom function for fetching a tree,
 	/// can call [`Table::get_tree_naive`]
-	fn get_tree() -> Result<Tree, Self::TableError> { unimplemented!()  }
+	fn get_tree() -> Result<Tree, Self::TableError> {
+		unimplemented!()
+	}
 }
 
 /// module containing table markers
@@ -175,7 +176,10 @@ pub mod table {
 	impl Table for Reservations {
 		type Key = u64;
 		type Value = Reservation;
-		fn name() -> &'static str { "reservation" }
+
+		fn name() -> &'static str {
+			"reservation"
+		}
 	}
 
 	/// Users database table marker
@@ -184,7 +188,10 @@ pub mod table {
 	impl Table for Users {
 		type Key = u64;
 		type Value = User;
-		fn name() -> &'static str { "user" }
+
+		fn name() -> &'static str {
+			"user"
+		}
 	}
 }
 
@@ -195,13 +202,10 @@ impl<'a, 'r, T: Table> FromRequest<'a, 'r> for Database<T> {
 		if let Some(db) = Database::<T>::open() {
 			Outcome::Success(db)
 		} else {
-			Outcome::Failure((Status::InternalServerError,
-				match T::has_get_tree() {
-					true => "failed to run custom db-loading function",
-					false => "failed to load database",
-				}
-			))
+			Outcome::Failure((Status::InternalServerError, match T::has_get_tree() {
+				true => "failed to run custom db-loading function",
+				false => "failed to load database",
+			}))
 		}
 	}
 }
-

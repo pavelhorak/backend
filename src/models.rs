@@ -67,19 +67,18 @@ pub struct NewReservation {
 impl From<NewReservation> for Reservation {
 	fn from(src: NewReservation) -> Reservation {
 		Reservation {
-			name: src.name,
+			name:        src.name,
 			description: src.description,
-			author: String::new(),
-			rooms: src.rooms,
-			begin_time: src.begin_time,
-			end_time: src.end_time,
-			layout: src.layout,
-			approved: false,
-			people: src.people,
+			author:      String::new(),
+			rooms:       src.rooms,
+			begin_time:  src.begin_time,
+			end_time:    src.end_time,
+			layout:      src.layout,
+			approved:    false,
+			people:      src.people,
 		}
 	}
 }
-
 
 /// Weird quick models
 #[derive(Serialize, Deserialize, Debug, Clone)]
