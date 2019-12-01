@@ -98,7 +98,7 @@ pub struct UpdateReservation {
 	/// 0b10 -> south
 	/// 0b11 -> celé auditorium
 	/// ```
-	pub rooms: Option<u16>,
+	pub rooms: Option<u8>,
 	/// počáteční čas rezervace
 	pub begin_time: Option<DateTime<Utc>>,
 	/// čas, kdy rezervace končí

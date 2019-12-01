@@ -2,13 +2,12 @@ use rocket::Route;
 use rocket_contrib::json::Json;
 
 use crate::auth::AuthToken;
-use crate::auth::roles::{Noob, Approver, Role};
+use crate::auth::roles::{Noob, Approver};
 
 
 use crate::db::{
 	Database,
 	table::Reservations,
-	table::Users,
 };
 
 use crate::models::{NewReservation, UpdateReservation, Reservation};
@@ -79,17 +78,40 @@ pub fn post(input: Json<NewReservation>, mut db: Database<Reservations>, usr: Au
 /// - `id`: identifikátor dané rezervace
 ///
 /// data:[`UpdateReservation`]
-#[patch("/events/<id>", data = "<_input>")]
-pub fn patch(id: u64, _input: Json<UpdateReservation>, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
+#[patch("/events/<id>", data = "<input>")]
+pub fn patch(id: u64, input: Json<UpdateReservation>, mut db: Database<Reservations>, usr: AuthToken<Noob>) -> Option<()> {
 	let event = db.read()
 		.get(id)?;
 
 	// TODO  roles are uggly
 	if event.author != usr.user.email || usr.user.role != "approver" {
-		None?
+		return None
 	}
 
-	// TODO actual patching
+	if db
+		.write()
+		.update::<_, Reservation, _>(id, |val: Option<Reservation>| if let Some(mut val) = val {
+			match input.clone() {
+				UpdateReservation { name, description, rooms, begin_time, end_time, layout, people } => {
+					name.and_then(|x| Some({ val.name = x }));
+					description.and_then(|x| Some({ val.description = x }));
+					rooms.and_then(|x| Some({ val.rooms = x }));
+					begin_time.and_then(|x| Some({ val.begin_time = x }));
+					end_time.and_then(|x| Some({ val.end_time = x }));
+					layout.and_then(|x| Some({ val.layout = x }));
+					people.and_then(|x| Some({ val.people = x }));
+				}
+			}
+
+			val.approved = false;
+
+			Some(val.clone())
+		} else {
+			None 
+		}).is_err()
+	{
+		return None
+	}
 	
 	Some(())
 }
