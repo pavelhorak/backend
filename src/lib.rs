@@ -40,33 +40,35 @@
 //!     └── static_server.rs - statický server
 //! ```
 #![feature(proc_macro_hygiene, decl_macro)]
+#![feature(associated_type_defaults)]
+#![feature(option_flattening)]
+#![allow(clippy::match_bool, clippy::option_map_unit_fn)]
 #![deny(missing_docs)]
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
+
 #[macro_use]
-extern crate diesel;
+extern crate lazy_static;
+
+extern crate serde_cbor;
 extern crate dotenv;
+extern crate chrono;
+extern crate serde;
+extern crate sled;
 
 use dotenv::dotenv;
 use rocket::http::Method;
-use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
-use std::str::FromStr;
-
-pub mod auth;
-pub mod rgi;
-pub mod db;
 pub mod static_server;
+pub mod booking;
+pub mod admin;
+pub mod auth;
 
-/// schéma databáze (vygenerováno Dieselem)
-#[allow(missing_docs)]
-pub mod schema;
-
-use db::DbConn;
-
+pub mod db;
+pub mod models;
 /// Vrací instanci Rocketu
 pub fn init() -> rocket::Rocket {
 	dotenv().ok();
@@ -89,7 +91,7 @@ pub fn init() -> rocket::Rocket {
 	rocket::ignite()
 		.register(catchers![static_server::not_found])
 		.mount("/", routes![static_server::index, static_server::frontend, static_server::favicon, auth::me])
-		.mount("/rgi/", rgi::routes())
+		.mount("/api/", booking::routes())
+		.mount("/admin/", admin::routes())
 		.attach(cors)
-		.attach(DbConn::fairing())
 }

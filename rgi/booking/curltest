@@ -1,2 +1,0 @@
-#!/bin/bash
-curl -H application/json localhost:8000/rgi/events/1

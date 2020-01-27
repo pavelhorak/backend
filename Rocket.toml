@@ -1,5 +1,2 @@
-[global.databases]
-postgres_db = { url = "auditorium_booking.sqlite3" }
-
 [production]
 port = 8000
